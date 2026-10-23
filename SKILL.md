@@ -15,6 +15,8 @@ Read the project's existing model assignment and preserve the user's choices. Th
 
 Do not copy credentials into this skill, a repository, reports, prompts or archives. Reuse the client's normal authentication. Runtime tests can consume quota: perform them only when the user's task authorizes actual calls. Installation, static doctor and offline report do not call models. Publishing to GitHub/PyPI or changing repository visibility requires the user's explicit destination and authorization; this skill is not publication consent.
 
+When the user requires configuration isolation, run model tests through a child CLI/App Server with a separately configured `CODEX_HOME`, as described in [native verification](docs/CLI_NATIVE_VERIFICATION.md). A project directory alone does not isolate client preferences. Do not use desktop agent model/effort overrides to establish that guarantee when their persistence scope is unknown. Compare global config hashes before and after without recording its contents; a mismatch must be disclosed and investigated, never reported as unchanged. Stop further overrides after a mismatch and do not overwrite concurrent user changes.
+
 ## Delegation contract
 
 Each child receives one goal, allowed paths, relevant evidence, constraints and expected output. Reports separate observed evidence from inference and unknowns. Explorer: EVIDENCE/ANSWER/UNRESOLVED. Researcher: FINDING/SOURCE/LIMITS/RECOMMENDATION. Triage: FAILURE_SIGNATURE/EVIDENCE/HYPOTHESES/NEXT_TEST/UNCERTAINTY. Keep worker reports near 300 words or less.
