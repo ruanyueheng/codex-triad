@@ -21,6 +21,8 @@ python tools/check_wheel.py
 
 Review the wheel, source ZIP, lean skill ZIP and SHA256SUMS. Tag/upload only after explicit release authorization; do not create a PyPI listing as a side effect. Keep alpha releases marked prerelease until compatibility justifies a stable label.
 
+`MANIFEST.in` is the explicit public-file allowlist for release builds and setuptools source distributions. Add each new source, test, fixture or document by its exact path; wildcards and recursive includes are refused by the release tool. The wheel is built from a temporary copy of only those files. Unlisted private notes, measurements and local modules are excluded even if their extensions match public files; `.gitignore` is not a packaging policy. Review file contents too: an allowlisted file can still contain private data if edited carelessly.
+
 ## Documentation references
 
 README organization draws from [uv](https://github.com/astral-sh/uv) (scope and quick start), [ripgrep](https://github.com/BurntSushi/ripgrep) (navigation, reproducible evidence and limitations) and [Anthropic Skills](https://github.com/anthropics/skills) (self-contained skills and concrete examples). These are organizational references, not copied implementation or endorsements.

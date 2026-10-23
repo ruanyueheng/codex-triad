@@ -45,6 +45,10 @@ Choose a catalog number or full ID and a supported reasoning effort for each res
 
 For automation use `--main-model`, `--worker-model`, `--advisor-model` and the corresponding `--*-effort` flags with IDs/options valid for your client. Existing user configuration remains protected. See [model assignment](MODEL_ASSIGNMENT.md).
 
+When updating an existing installation, omitted flags keep its saved models, reasoning efforts and concurrency. For example, `init --project ../my-app --max-subagents 2` changes only concurrency. Fresh installations still use the legacy presets unless you select models.
+
+The default and configured Codex homes are protected targets, including when a project would use one as its `.codex` directory. Install, uninstall and recovery refuse these targets before creating a lock. Choose a normal project directory; managed worktrees inside a Codex home remain supported.
+
 The main model is a project configuration target: it does not switch the model of an already-running desktop chat. Open a new session in the trusted target and verify its effective settings. Workers and advisor are custom roles, not an independent security sandbox.
 
 If a desktop configuration contains fields or MCP transports unsupported by the installed CLI, App Server startup can fail before listing models. Preserve the original configuration, configure/authenticate a separate Codex home through the normal client, and pass `--codex-home PATH`. Do not rewrite global settings to hide a client-version mismatch. See [troubleshooting](TROUBLESHOOTING.md).

@@ -1,3 +1,4 @@
+import csv
 import tempfile
 import unittest
 from pathlib import Path
@@ -64,6 +65,53 @@ class BenchmarkTests(unittest.TestCase):
         self.csv.write_text(header + "a,triad,true,1,0,0,1e308\nb,triad,true,1,0,0,1e308\n")
         with self.assertRaises(BenchmarkError):
             summarize(self.csv)
+
+    def paired_rows(self):
+        common = dict(task_id="task-a", elapsed_seconds="10", input_tokens="100", output_tokens="20",
+                      cost_usd="UNKNOWN", codex_version="0.163.0", task_snapshot="frozen-sha",
+                      prompt_version="task-v1", evidence_source="private-log", pair_id="1",
+                      acceptance_command="python -m unittest", failure_reason="")
+        return [{**common, "strategy": "baseline", "success": "false", "run_id": "b1",
+                 "model_ids": "main", "failure_reason": "acceptance failed"},
+                {**common, "strategy": "triad", "success": "true", "run_id": "t1", "model_ids": "main,worker,advisor"}]
+
+    def write_rows(self, rows):
+        with self.csv.open("w", newline="", encoding="utf-8") as stream:
+            writer = csv.DictWriter(stream, fieldnames=rows[0])
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def test_paired_report_keeps_failures_unknown_costs_and_repetitions(self):
+        rows = self.paired_rows()
+        rows += [{**r, "pair_id": "2", "run_id": r["run_id"] + "-repeat"} for r in rows]
+        self.write_rows(rows)
+        baseline, triad = summarize(self.csv, paired=True)
+        self.assertEqual((baseline.sample_count, triad.sample_count), (2, 2))
+        self.assertEqual((baseline.success_count, triad.success_count), (0, 2))
+        self.assertIsNone(triad.total_cost_usd)
+
+    def test_paired_report_rejects_mismatched_conditions(self):
+        for field in ("codex_version", "task_snapshot", "prompt_version", "acceptance_command"):
+            with self.subTest(field=field):
+                rows = self.paired_rows()
+                rows[1][field] = "different"
+                self.write_rows(rows)
+                with self.assertRaisesRegex(BenchmarkError, field):
+                    summarize(self.csv, paired=True)
+
+    def test_paired_report_rejects_missing_duplicate_or_unexplained_runs(self):
+        for case in ("unmatched", "duplicate", "run_id", "missing_metadata", "missing_failure", "different_task"):
+            with self.subTest(case=case):
+                rows = self.paired_rows()
+                if case == "unmatched": rows.pop()
+                if case == "duplicate": rows.append({**rows[1], "run_id": "t2"})
+                if case == "run_id": rows[1]["run_id"] = rows[0]["run_id"]
+                if case == "missing_metadata": rows[1]["model_ids"] = "UNKNOWN"
+                if case == "missing_failure": rows[0]["failure_reason"] = ""
+                if case == "different_task": rows[1]["task_id"] = "task-b"
+                self.write_rows(rows)
+                with self.assertRaises(BenchmarkError):
+                    summarize(self.csv, paired=True)
 
 if __name__ == '__main__':
     unittest.main()

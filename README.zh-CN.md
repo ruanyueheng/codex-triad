@@ -3,6 +3,9 @@
 [![CI](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml/badge.svg)](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
 [![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![AgentShield Security](https://merx.help/badge/A+.svg)](https://merx.help/shield)
+
+AgentShield 为第三方扫描徽章，适用范围和证据状态见[安全说明](SECURITY.md#agentshield-badge)。
 
 **三权分工，模型自选，在 Codex 中完成协作开发。**
 
@@ -63,7 +66,7 @@ python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 
 ## 测试
 
-77 项单元/集成测试，Windows/Linux 与 Python 3.11–3.14 的 CI，独立 wheel/skill 安装检查，以及真实三模型 CLI 协作验证。复现命令和详细结果见[验证记录](docs/VALIDATION.md)。
+单元/集成测试、Windows/Linux 与 Python 3.11–3.14 的 CI、独立 wheel/skill 安装检查，以及真实三模型 CLI 协作验证。复现命令和详细结果见[验证记录](docs/VALIDATION.md)。
 
 ## 文档
 

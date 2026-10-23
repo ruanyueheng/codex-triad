@@ -24,7 +24,9 @@ Status markers: `[x]` implemented, `[ ]` proposed (not promised).
 
 - [x] Opt-in, privacy-aware runtime evidence collector for agent/model/thread IDs (only where supported by Codex).
 - [ ] Reproducible A/B harness for tasks and real token/cost comparison.
+- [x] Offline paired CSV validation for frozen task conditions, repeated trials and retained failures; real measurements remain pending.
 - [ ] Version compatibility matrix with pinned client builds and accepted model IDs.
+- [x] Offline App Server transport regressions and collector replay of the sanitized CLI 0.163.0 fixture.
 - [x] Better config migration/rollback reports and conflict inspection.
 - [x] User-selected models and reasoning efforts, including model reuse across responsibilities.
 - [x] Standalone skill archive with isolated, site-packages-free lifecycle verification.

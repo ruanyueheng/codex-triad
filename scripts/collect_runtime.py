@@ -8,6 +8,7 @@ import shutil
 import sys
 import time
 import urllib.request
+from collections import deque
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from codex_triad.evidence import verify_runtime
@@ -28,7 +29,7 @@ def main():
     args = parser.parse_args()
     if not args.run: parser.error("--run is required because this test calls models and consumes quota")
     project = args.project.resolve(strict=True)
-    assert_safe_paths(project, [project / ".codex/triad-state.json"])
+    assert_safe_paths(project, [project / ".codex/triad-state.json"], codex_home=args.codex_home)
     settings = _previous_settings(_read_state(project))
     if settings is None: parser.error("Install Triad into the target project first")
     executable = shutil.which("codex")
@@ -66,18 +67,30 @@ def main():
                 "model": settings.main_model, "effort": settings.main_effort, "multiAgentMode": "explicitRequestOnly"})
             active = (root_id, turn["turn"]["id"])
             deadline = time.monotonic() + 240
-            events = list(client.events)
-            while time.monotonic() < deadline:
-                try: message = client.receive()
+            pending = deque(client.events)
+            events = []
+            while pending or time.monotonic() < deadline:
+                try: message = pending.popleft() if pending else client.receive()
                 except queue.Empty: continue
                 events.append(message)
-                if message.get("method") == "turn/completed" and message.get("params", {}).get("threadId") == root_id:
+                params = message.get("params", {})
+                if (message.get("method") == "turn/completed" and params.get("threadId") == root_id
+                        and params.get("turn", {}).get("id") == active[1]):
                     active = None
                     break
             if active: raise TimeoutError("Runtime test exceeded 240 seconds")
             children = client.call("thread/list", {"parentThreadId": root_id, "limit": 100})
-            safe_events = [e for e in events if e.get("method") == "turn/completed" or
-                           e.get("params", {}).get("item", {}).get("type") == "subAgentActivity"]
+            safe_events = []
+            for event in events:
+                params = event.get("params", {})
+                if params.get("threadId") != root_id:
+                    continue
+                if event.get("method") == "turn/completed":
+                    if params.get("turn", {}).get("id") == turn["turn"]["id"]:
+                        safe_events.append(event)
+                elif (params.get("turnId") == turn["turn"]["id"]
+                      and params.get("item", {}).get("type") == "subAgentActivity"):
+                    safe_events.append(event)
             # Keep only protocol metadata needed by the offline verifier; exclude prompts, config and credentials.
             for event in safe_events:
                 if event.get("method") == "turn/completed":

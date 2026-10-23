@@ -21,6 +21,33 @@ class StorageTests(unittest.TestCase):
         return {p.relative_to(self.root): p.read_bytes() for p in self.root.rglob("*")
                 if p.is_file() and p.name != ".triad.lock"}
 
+    def test_all_mutations_refuse_default_and_configured_codex_homes(self):
+        user = self.root / "user"
+        configured = self.root / "relocated" / ".codex"
+        for home in (user / ".codex", configured):
+            home.mkdir(parents=True)
+            (home / "config.toml").write_text('model = "private-model"\n', encoding="utf-8")
+        operations = (lambda p: install(p, Settings()), lambda p: install(p, Settings(), dry_run=True),
+                      uninstall, lambda p: uninstall(p, dry_run=True), storage.recover)
+        with patch("pathlib.Path.home", return_value=user), patch.dict(os.environ, {"CODEX_HOME": str(configured)}):
+            for home in (user / ".codex", configured):
+                for target in (home, home.parent):
+                    for operation in operations:
+                        with self.subTest(home=home, target=target, operation=operation):
+                            before = {p: p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
+                            with self.assertRaisesRegex(storage.InstallationError, "Codex home"):
+                                operation(target)
+                            self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob("*") if p.is_file()})
+
+    def test_managed_worktree_below_codex_home_remains_supported(self):
+        home = self.root / "home"
+        project = home / "worktrees" / "task" / "project"
+        project.mkdir(parents=True)
+        with patch.dict(os.environ, {"CODEX_HOME": str(home)}):
+            install(project, Settings())
+            uninstall(project)
+        self.assertFalse((project / "AGENTS.md").exists())
+
     def fail_once(self, target):
         original = storage.atomic_write
         failed = False

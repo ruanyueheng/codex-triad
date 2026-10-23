@@ -7,7 +7,9 @@ python scripts/triad.py init --project "C:\Projects\MyApp" --interactive --dry-r
 python scripts/triad.py init --project "C:\Projects\MyApp" --interactive
 ```
 
-交互流程：读取客户端 `model/list` 的可见候选及推理强度 → 为三种职责逐一输入编号或模型ID → 从所选模型支持的强度中选择 → 输出分配摘要与安装结果。不会因查询失败而退回硬编码候选列表；失败或取消时不写项目文件。已有安装会作为初选值，明确传入的模型/强度参数也可作为初选值。非交互旧参数和默认行为保持兼容。
+交互流程：读取客户端 `model/list` 的可见候选及推理强度 → 为三种职责逐一输入编号或模型ID → 从所选模型支持的强度中选择 → 输出分配摘要与安装结果。不会因查询失败而退回硬编码候选列表；失败或取消时不写项目文件。已有安装会作为初选值，明确传入的模型/强度参数也可作为初选值。
+
+非交互更新同样继承已有模型、推理强度和并发数，只覆盖明确传入的参数。例如 `init --project PATH --max-subagents 2` 只调整并发数；重复执行不带覆盖参数的 init 会保留原分配。首次安装仍使用原有预设值。旧参数和清单格式保持兼容。
 
 如使用独立登录的 Codex home，可加 `--codex-home PATH`；继承现有系统代理可加 `--system-proxy`。仅影响模型查询子进程，不修改全局 Codex 配置或系统代理。普通 init 不查询模型；只有 --interactive 显式启用目录查询，不发起生成 turn，也不推断费用。
 

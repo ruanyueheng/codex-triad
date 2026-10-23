@@ -23,6 +23,7 @@ Builds need setuptools>=68 and wheel; normal pip may fetch tooling. CI runs thes
 4. Do not add screenshots or benchmark numbers without provenance, client/build, task details and protocol.
 5. Never commit private `.codex/config.toml` files containing provider endpoints/tokens; sanitize all logs.
 6. Explain whether behavior is a deterministic capability, an AGENTS.md instruction, or a user-observed result.
+7. Add new public source, tests, fixtures and docs to the explicit `MANIFEST.in` file list; release builds exclude unlisted files. Do not add wildcard includes or private evaluation data.
 
 Describe the concrete failure, resulting behavior and observed tests. Preserve the five CLI commands and existing manifests, or explain migration. See [evaluation guidelines](docs/EVALUATION.md) for performance claims.
 
