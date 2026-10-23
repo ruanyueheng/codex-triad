@@ -10,6 +10,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from codex_triad.cli import main
+from codex_triad.installer import install
+from codex_triad.templates import Settings
 
 
 class CliTests(unittest.TestCase):
@@ -79,3 +81,40 @@ class CliTests(unittest.TestCase):
         result = self.run_cli("report", "--runtime-evidence", str(path), "--json")
         self.assertEqual(result.returncode, 2)
         self.assertIn("rejected", result.stderr)
+
+    def test_partial_update_preserves_model_assignment_and_repeated_init(self):
+        settings = Settings(main_model="custom/main", worker_model="custom/worker",
+                            advisor_model="custom/advisor", main_effort="low",
+                            worker_effort="low", advisor_effort="medium", max_subagents=5)
+        install(self.root, settings)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(["init", "--project", str(self.root), "--max-subagents", "2"]), 0)
+        manifest = self.root / ".codex/triad-state.json"
+        expected = {**settings.__dict__, "max_subagents": 2}
+        self.assertEqual(json.loads(manifest.read_text())["settings"], expected)
+        before = {p: p.read_bytes() for p in self.root.rglob("*") if p.is_file()}
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(main(["init", "--project", str(self.root)]), 0)
+        self.assertEqual(before, {p: p.read_bytes() for p in before})
+
+    def test_explicit_discovery_home_cannot_be_install_target(self):
+        home = self.root / ".codex"
+        for mode in ("--interactive", "--recover", "--dry-run"):
+            with self.subTest(mode=mode), patch("codex_triad.cli.discover_models") as discover, contextlib.redirect_stderr(io.StringIO()) as err:
+                result = main(["init", "--project", str(self.root), mode, "--codex-home", str(home)])
+            self.assertEqual(result, 2)
+            self.assertIn("Codex home", err.getvalue())
+            discover.assert_not_called()
+            self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_paired_csv_report_and_incompatible_source(self):
+        csv = self.root / "paired.csv"
+        csv.write_text("task_id,strategy,success,elapsed_seconds,input_tokens,output_tokens,cost_usd,run_id,codex_version,model_ids,task_snapshot,prompt_version,evidence_source,pair_id,acceptance_command,failure_reason\n"
+                       "x,baseline,false,10,100,20,,b1,v1,main,sha1,p1,log1,1,test,failed test\n"
+                       "x,triad,true,12,110,30,,t1,v1,worker,sha1,p1,log2,1,test,\n", encoding="utf-8")
+        result = self.run_cli("report", "--csv", str(csv), "--paired", "--json")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)[0]["success_count"], 0)
+        result = self.run_cli("report", "--csv", str(csv), "--paired")
+        self.assertIn("Validated 1", result.stdout)
+        self.assertEqual(self.run_cli("report", "--runtime-evidence", str(csv), "--paired").returncode, 2)

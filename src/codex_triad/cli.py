@@ -69,6 +69,7 @@ def make_parser() -> argparse.ArgumentParser:
     source.add_argument("--csv", type=Path, help="Measured experiment rows")
     source.add_argument("--runtime-evidence", type=Path, help="Validate supplied App Server role/thread/model records offline")
     report.add_argument("--json", action="store_true", help="Print machine-readable summary")
+    report.add_argument("--paired", action="store_true", help="Require matched baseline/triad CSV runs with frozen provenance and acceptance commands")
     report.add_argument("--project", type=Path, help="Read this project's model assignment for runtime evidence verification")
     return parser
 
@@ -79,17 +80,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.command in ("init", "uninstall") and args.recover:
             if args.dry_run:
                 raise InstallationError("--recover cannot be combined with --dry-run")
+            project = args.project.resolve()
+            assert_safe_paths(project, [project / ".codex/.triad.lock"], codex_home=getattr(args, "codex_home", None))
             for item in recover(args.project):
                 print(item)
             return 0
         if args.command == "init":
-            defaults = Settings()
-            if args.interactive:
-                project = args.project.resolve()
-                if not project.is_dir():
-                    raise ModelSelectionError("Project directory not found")
-                assert_safe_paths(project, [project / ".codex/triad-state.json"])
-                defaults = _previous_settings(_read_state(project)) or defaults
+            project = args.project.resolve()
+            if not project.is_dir():
+                raise InstallationError("Project directory not found")
+            assert_safe_paths(project, [project / ".codex/triad-state.json"], codex_home=args.codex_home)
+            defaults = _previous_settings(_read_state(project)) or Settings()
             settings = Settings(**{key: getattr(args, key) if getattr(args, key) is not None else getattr(defaults, key) for key in
                 ("main_model", "advisor_model", "worker_model", "main_effort", "advisor_effort", "worker_effort")},
                 max_subagents=args.max_subagents if args.max_subagents is not None else defaults.max_subagents)
@@ -113,6 +114,8 @@ def main(argv: list[str] | None = None) -> int:
             print(SMOKE[args.phase] + EVIDENCE_REQUEST)
             return 0
         if args.command == "report":
+            if args.paired and not args.csv:
+                raise BenchmarkError("--paired requires --csv")
             if args.runtime_evidence:
                 settings = Settings()
                 if args.project:
@@ -125,10 +128,12 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps(result, ensure_ascii=False, indent=2) if args.json else
                       "PASS: three role threads and runtime models, overlapping workers, advisor after workers. Backend identity UNKNOWN.")
                 return 0
-            results = summarize(args.csv)
+            results = summarize(args.csv, paired=args.paired)
             if args.json:
                 print(json.dumps([r.to_dict() for r in results], ensure_ascii=False, indent=2))
             else:
+                if args.paired:
+                    print(f"Validated {results[0].sample_count} baseline/triad task pairs; failed runs included.")
                 for r in results:
                     print(f"[{r.strategy.upper()}] {r.sample_count} runs, {r.success_count} passed "
                           f"({r.success_count / r.sample_count:.1%}); median {r.median_seconds:.2f}s; "

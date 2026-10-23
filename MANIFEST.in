@@ -1,14 +1,79 @@
-include LICENSE README.md README.zh-CN.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md CHANGELOG.md RELEASE_NOTES.md
-include WORK_HANDOFF.md WORK_START_HERE.md WORK_PROMPT.txt task_plan.md findings.md progress.md
+# Reviewed public files only. Add new source/tests/docs here before building.
+# This manifest also restricts setuptools source distributions.
+global-exclude *
+include .github/ISSUE_TEMPLATE/bug_report.yml
+include .github/ISSUE_TEMPLATE/config.yml
+include .github/ISSUE_TEMPLATE/feature_request.yml
+include .github/pull_request_template.md
+include .github/workflows/ci.yml
+include .gitignore
+include CHANGELOG.md
+include CODE_OF_CONDUCT.md
+include CONTRIBUTING.md
+include LICENSE
+include MANIFEST.in
+include README.md
+include README.zh-CN.md
+include RELEASE_NOTES.md
+include SECURITY.md
 include SKILL.md
-recursive-include scripts *.py
-recursive-include docs *.md
-recursive-include evaluation *.csv *.json
-recursive-include .github *.yml *.md
-recursive-include tests *.py
-recursive-include tools *.py
-global-exclude *.pyc
-prune dist
-prune build
-prune .codex
-prune .venv
+include WORK_HANDOFF.md
+include WORK_PROMPT.txt
+include WORK_START_HERE.md
+include docs/ADR-001-SAFE-INSTALL.md
+include docs/ARCHITECTURE.md
+include docs/CLI_NATIVE_VERIFICATION.md
+include docs/EVALUATION.md
+include docs/GETTING_STARTED.md
+include docs/MODEL_ASSIGNMENT.md
+include docs/OFFICIAL_COMPATIBILITY.md
+include docs/PUBLISHING.md
+include docs/ROADMAP.md
+include docs/RUNTIME_VERIFICATION.md
+include docs/TROUBLESHOOTING.md
+include docs/VALIDATION.md
+include docs/work/ACCEPTANCE_CHECKLIST.md
+include docs/work/AUDIT_FINDINGS.md
+include docs/work/CHANGE_SUMMARY.md
+include docs/work/CLI_SKILL_DELIVERY.md
+include docs/work/CURRENT_STATUS_AND_RISKS.md
+include docs/work/FULL_FLOW_REPORT.md
+include docs/work/ISOLATED_VALIDATION_REPORT.md
+include docs/work/REQUIREMENTS_AND_DESIGN.md
+include docs/work/START_HERE.md
+include docs/work/TEST_RESULTS.md
+include docs/work/VALIDATION_REPORT.md
+include evaluation/cli-runtime-20261023.json
+include evaluation/cli-runtime-20261023.result.json
+include evaluation/runs.template.csv
+include evaluation/runtime-evidence.template.json
+include evaluation/tasks.json
+include findings.md
+include progress.md
+include pyproject.toml
+include scripts/collect_runtime.py
+include scripts/triad.py
+include src/codex_triad/__init__.py
+include src/codex_triad/__main__.py
+include src/codex_triad/appserver.py
+include src/codex_triad/benchmark.py
+include src/codex_triad/checker.py
+include src/codex_triad/cli.py
+include src/codex_triad/evidence.py
+include src/codex_triad/installer.py
+include src/codex_triad/models.py
+include src/codex_triad/storage.py
+include src/codex_triad/templates.py
+include task_plan.md
+include tests/test_appserver.py
+include tests/test_benchmark.py
+include tests/test_checker.py
+include tests/test_cli.py
+include tests/test_collector.py
+include tests/test_evidence.py
+include tests/test_installer.py
+include tests/test_models.py
+include tests/test_release.py
+include tests/test_storage.py
+include tools/build_release.py
+include tools/check_wheel.py

@@ -2,6 +2,16 @@
 
 This is an alpha preview. A passing static check, a successful model call, native role metadata and a provider-side identity proof are different kinds of evidence.
 
+## Review hardening — 2026-10-24
+
+- Windows / Python 3.13.5: 93 unit/integration tests passed, including the new home-target, partial-update, packaging, transport, collector and paired-CSV regressions. Source compilation and the diff whitespace check (allowing the existing CRLF files) passed.
+- The clean wheel and standalone skill lifecycles passed. An extracted source ZIP also passed all 93 tests without a Git checkout.
+- In an isolated copy, synthetic private files were added under `evaluation/`, `docs/` and `src/codex_triad/`. Actual wheel, source ZIP, skill ZIP and setuptools source-distribution builds excluded both their names and marker contents.
+- `tests/test_collector.py` replays the existing sanitized Windows CLI 0.163.0 evidence through collection, including completion buffered before the request reply and an unrelated earlier turn. `tests/test_appserver.py` uses synthetic stdio messages to cover request/response ID overlap, errors, malformed messages, disconnect and timeout. These are offline contract checks, not a new live-client compatibility claim.
+- `report --paired` was tested with synthetic matched/mismatched records, repeated tasks, failed runs and unknown costs. No real A/B study or savings result was produced.
+
+The existing Windows/Linux CI matrix will run these regressions on the submitted commit. This local check did not run macOS or a new paid Codex workflow. The historical observations below retain their original date and scope.
+
 ## Observed results — 2026-10-23
 
 | Check | Observed scope | Meaning |

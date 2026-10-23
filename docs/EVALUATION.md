@@ -31,7 +31,25 @@ Columns:
 | `output_tokens` | integer or blank | Actual observed output usage; blank means unknown |
 | `cost_usd` | nonnegative float or blank | Observed monetary charge, **not** assumed token pricing |
 
-`report` summarizes each strategy separately. If any metric value is missing within a strategy, its total is reported as **unknown**, not a false partial total. It does **not** claim causal improvement or enforce pairing; researchers must inspect the underlying raw task-matched records.
+`report` summarizes each strategy separately. If any metric value is missing within a strategy, its total is reported as **unknown**, not a false partial total. The default mode preserves the legacy descriptive report. Use `--paired` below to check task matching; neither mode claims causal improvement or verifies the authenticity of measurements.
+
+## Paired baseline/Triad checks
+
+Freeze each task's repository snapshot, task prompt version, client version and acceptance command before the runs. Run baseline and Triad from separate clean copies, alternate their order between repetitions, and retain failures. The template now includes `pair_id` and `acceptance_command`:
+
+- `(task_id, pair_id)` identifies one repetition with exactly one baseline row and one Triad row.
+- Each row needs a unique `run_id` and complete `codex_version`, `model_ids`, `task_snapshot`, `prompt_version`, `evidence_source` and `acceptance_command` fields.
+- Snapshot, client version, task prompt version and acceptance command must match within each pair. Model assignments and observed outcomes may differ.
+- A failed run needs `success=false` and a nonempty `failure_reason`. Unknown token/cost fields remain blank or `UNKNOWN` and are never filled from estimates.
+
+```bash
+codex-triad report --csv /private/triad-runs.csv --paired
+codex-triad report --csv /private/triad-runs.csv --paired --json
+```
+
+Mismatched conditions, duplicate/missing strategies, reused run IDs or incomplete provenance exit with code 2. Successful JSON output keeps the existing two strategy summaries, including failed runs. No model calls or acceptance commands are executed by the report command. Inspect the private logs to confirm that the recorded conditions were actually followed; matching strings alone are not proof.
+
+中文：配对模式按任务和重复编号核对单模型/Triad 两条记录；保留失败样本，拒绝快照、客户端、题面版本或验收命令不一致的对比。它提供离线检查，尚未产生真实 A/B 结果。
 
 ## 0.2 扩展 / Optional extensions
 
@@ -50,7 +68,7 @@ Columns:
 
 `evaluation/tasks.json` 提供入口追踪、版本兼容、重复故障、跨模块修复、提交前审查五类任务；仅为协议，不包含虚构运行结果。每类任务用相同快照、相同验收跑 baseline/triad，建议至少 10 个具体样本并重复；记录样本量与配对关系。`runtime-evidence.template.json` 单独记录每次角色/模型/线程核验。
 
-English: legacy CSV remains valid. Optional metrics and provenance fields support broader experiments, but no automatic collection, pairing enforcement, semantic quality grading or source verification is performed. Missing data stays unknown. Templates and task definitions are protocol-only, not experimental evidence.
+English: legacy CSV remains valid. Optional metrics and provenance fields support broader experiments, with pairing checks available through `--paired`. No automatic collection, semantic quality grading or source verification is performed. Missing data stays unknown. Templates and task definitions are protocol-only, not experimental evidence.
 
 ## Suggested claims policy
 

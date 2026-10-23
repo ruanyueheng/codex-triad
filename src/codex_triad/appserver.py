@@ -28,6 +28,8 @@ class Client:
         message = self.queue.get(timeout=timeout)
         if message is None:
             raise RuntimeError("Codex App Server closed; inspect private server.stderr.txt")
+        if not isinstance(message, dict):
+            raise RuntimeError("Invalid App Server message: expected a JSON object")
         if "method" in message and "id" in message:
             self.send({"id": message["id"], "error": {"code": -32601, "message": "Interactive approvals are unavailable in this read-only smoke test"}})
         return message
@@ -40,7 +42,9 @@ class Client:
         while time.monotonic() < deadline:
             try: message = self.receive()
             except queue.Empty: continue
-            if message.get("id") == request_id:
+            if "method" not in message and message.get("id") == request_id:
+                if ("result" in message) == ("error" in message):
+                    raise RuntimeError("Invalid App Server response: expected exactly one of result/error")
                 if "error" in message: raise RuntimeError(json.dumps(message["error"]))
                 return message.get("result")
             self.events.append(message)

@@ -48,7 +48,7 @@ class Result:
         }
 
 
-def summarize(path: Path) -> list[Result]:
+def summarize(path: Path, *, paired: bool = False) -> list[Result]:
     if not path.is_file():
         raise BenchmarkError(f"Benchmark CSV not found: {path}")
     try:
@@ -62,6 +62,8 @@ def summarize(path: Path) -> list[Result]:
     if not rows:
         raise BenchmarkError("CSV contains no experiment rows")
     by_strategy: dict[str, list[dict]] = defaultdict(list)
+    pairs: dict[tuple[str, str], dict[str, dict]] = defaultdict(dict)
+    run_ids = set()
     for line, row in enumerate(rows, start=2):
         if None in row or any(row.get(key) is None for key in COLUMNS):
             raise BenchmarkError(f"line {line}: row length does not match CSV header")
@@ -73,6 +75,19 @@ def summarize(path: Path) -> list[Result]:
         success = (row.get("success") or "").strip().lower()
         if success not in ("true", "false"):
             raise BenchmarkError(f"line {line}: success must be true or false")
+        if paired:
+            metadata = {key: (row.get(key) or "").strip() for key in (*METADATA, "pair_id", "acceptance_command")}
+            if any(value.upper() in ("", "UNKNOWN", "MODEL_NOT_VERIFIED") for value in metadata.values()):
+                raise BenchmarkError(f"line {line}: paired reports require complete provenance, pair_id and acceptance_command")
+            if metadata["run_id"] in run_ids:
+                raise BenchmarkError(f"line {line}: duplicate run_id")
+            run_ids.add(metadata["run_id"])
+            pair = pairs[(row["task_id"].strip(), metadata["pair_id"])]
+            if strategy in pair:
+                raise BenchmarkError(f"line {line}: duplicate strategy within a task/pair_id")
+            if success == "false" and (row.get("failure_reason") or "").strip().upper() in ("", "UNKNOWN"):
+                raise BenchmarkError(f"line {line}: failed paired runs require failure_reason")
+            pair[strategy] = metadata
         parsed = {"success": success == "true"}
         try:
             seconds = float(row["elapsed_seconds"])
@@ -103,6 +118,13 @@ def summarize(path: Path) -> list[Result]:
         except (ValueError, TypeError) as exc:
             raise BenchmarkError(f"line {line}: invalid metric ({exc})") from exc
         by_strategy[strategy].append(parsed)
+
+    for key, pair in pairs.items():
+        if set(pair) != set(STRATEGIES):
+            raise BenchmarkError(f"Unmatched task/pair_id: {key}; retain both baseline and triad, including failures")
+        for field in ("codex_version", "task_snapshot", "prompt_version", "acceptance_command"):
+            if pair["baseline"][field] != pair["triad"][field]:
+                raise BenchmarkError(f"Pair {key} has different {field}")
 
     results = []
     for strategy in STRATEGIES:

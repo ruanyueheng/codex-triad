@@ -21,7 +21,15 @@ MANAGED_PATHS = {"AGENTS.md", ".codex/config.toml", ".codex/triad-state.json",
 JOURNAL = ".codex/.triad-transaction.json"
 
 
-def assert_safe_paths(project: Path, targets: list[Path]) -> None:
+def assert_safe_paths(project: Path, targets: list[Path], *, codex_home: Path | None = None) -> None:
+    homes = {Path.home() / ".codex"}
+    if os.environ.get("CODEX_HOME"):
+        homes.add(Path(os.environ["CODEX_HOME"]))
+    if codex_home is not None:
+        homes.add(codex_home)
+    # Managed worktrees below a home are valid; the home itself and its config owner are not.
+    if any(home.resolve() in (project.resolve(), (project / ".codex").resolve()) for home in homes):
+        raise InstallationError("Target overlaps a Codex home; choose a project directory instead")
     for target in targets:
         if not target.is_relative_to(project) or ".." in target.parts:
             raise InstallationError(f"Path escapes project: {target}")

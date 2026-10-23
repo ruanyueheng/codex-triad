@@ -3,6 +3,9 @@
 [![CI](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml/badge.svg)](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
 [![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![AgentShield Security](https://merx.help/badge/A+.svg)](https://merx.help/shield)
+
+AgentShield is a third-party scan badge; see its [scope and verification status](SECURITY.md#agentshield-badge).
 
 **Three responsibilities. Your choice of models. One Codex workflow.**
 
@@ -63,7 +66,7 @@ The five commands are `init`, `doctor`, `smoke`, `uninstall` and `report`. Add `
 
 ## Tests
 
-77 unit/integration tests, Windows/Linux CI on Python 3.11–3.14, clean wheel/skill installation checks, and an observed three-model CLI workflow. Details and reproducible commands are in [validation](docs/VALIDATION.md).
+Unit/integration tests, Windows/Linux CI on Python 3.11–3.14, clean wheel/skill installation checks, and an observed three-model CLI workflow. Details and reproducible commands are in [validation](docs/VALIDATION.md).
 
 ## Documentation
 
