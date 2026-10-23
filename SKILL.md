@@ -1,6 +1,6 @@
 ---
 name: codex-triad
-description: Set up or use a project-local Sol/Luna/Astra workflow with bounded research, implementation and advisor review. Use when the user requests Codex Triad, three-tier model collaboration, or its installation and runtime verification; skip trivial changes that do not benefit from delegation.
+description: Set up or use a project-local Codex workflow with user-selected coordinator, worker and advisor models, bounded research, implementation and review. Use when the user requests Codex Triad, three-tier model collaboration, or its installation and runtime verification; skip trivial changes that do not benefit from delegation.
 ---
 
 # Codex Triad

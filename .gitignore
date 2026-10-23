@@ -19,3 +19,6 @@ dist/
 
 # Machine-local test-directory pointer, not publication material.
 docs/work/ISOLATION_LOCATION.txt
+
+# Private local validation summary; never ship it.
+docs/work/ISOLATED_VALIDATION_SUMMARY.json

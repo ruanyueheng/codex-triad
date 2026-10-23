@@ -1,81 +1,113 @@
-> 正式源码仓库：[ruanyueheng/codex-triad](https://github.com/ruanyueheng/codex-triad)（当前为私有）。克隆整个仓库即可获得自包含 skill，勿只复制 SKILL.md。
+# Codex Triad
 
-> 0.2.0a3：三种职责自由分配模型。运行 `python scripts/triad.py init --project PATH --interactive --dry-run`，从客户端实时返回的候选列表逐一选择主协调、工作者、顾问及推理强度；同一模型可以复用。去掉 --dry-run 后写入项目。角色不固定绑定任何模型家族。
+[![CI](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml/badge.svg)](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)](pyproject.toml)
+[![MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> 0.2.0a3：独立 CLI App Server 已取得三个角色的自动加载、线程和运行时模型证据；提供自包含 skill 和离线证据核验。见 [CLI 验收](docs/CLI_NATIVE_VERIFICATION.md)。后端独立身份仍未核验，其他账户/版本须复验。
+**在 Codex 中，为协调、探索和审查分别选择模型。**
 
-# Codex Triad · Codex 三级多 Agent 协作工具
+[English](README.md) · [上手指南](docs/GETTING_STARTED.md) · [验证结果](docs/VALIDATION.md) · [故障排查](docs/TROUBLESHOOTING.md)
 
-[English](README.md) · [架构](docs/ARCHITECTURE.md) · [验证报告](docs/work/VALIDATION_REPORT.md) · [安全边界](SECURITY.md)
+Codex Triad 是面向 Codex 原生子 Agent 的项目级 CLI 和 Agent Skill。你可以为三种职责分别选择模型与推理强度，预览配置变化，并保留已有设置。同一个模型可以承担多个职责。
 
-**0.2.0a3 本地预览，非 OpenAI 官方项目。** Triad 生成并维护 Codex 原生自定义 Agent 配置。它不代理模型请求，不强制调度，不保证节省额度。
+**Alpha 预览版 · 社区项目，非 OpenAI 官方项目。** 审查检查点是指令约定，不是强制 hook。模型可用性取决于你的客户端和账户。
 
-以下仅为兼容旧版的默认预设，用户可以全部替换：
+## 工作方式
 
-- `gpt-6.1-sol`：主协调与源码实现。
-- `gpt-6-luna`：Explorer、Researcher、Triage 的有限范围只读调查。
-- `gpt-6-astra`：重大设计、安全、两次同类失败、非琐碎提交前的顾问审查。
+| 职责 | 工作 | 原生角色 |
+|---|---|---|
+| 主协调 | 负责实现、测试和最终结果 | 主会话 |
+| 工作者 | 调查有边界、彼此独立的问题 | `triad_explorer`、`triad_researcher`、`triad_triage` |
+| 顾问 | 审查重大决策、重复失败和非琐碎提交 | `triad_architect` |
 
-这些是目标配置；真实账户可访问性、子线程和模型身份仍为 **NOT_VERIFIED**。只读是角色指令，权限继承父会话。
-
-## Windows 上手
-
-Python 3.11+。解压源码 ZIP，进入含 `pyproject.toml` 的目录；无需先创建 GitHub 仓库。
-
-```powershell
-py -3 -m pip install -e .
-py -3 -m codex_triad --help
-codex-triad init --project "C:\Projects\MyApp" --dry-run
-codex-triad init --project "C:\Projects\MyApp"
-codex-triad doctor --project "C:\Projects\MyApp" --json
-codex-triad smoke --phase workers
-codex-triad smoke --phase advisor
+```text
+任务 → 主协调 → 有限范围的工作者 → 实现与测试
+             → 在相关检查点调用顾问 → 结果与证据
 ```
 
-没有 `codex-triad` 命令时，用 `py -3 -m codex_triad` 替代。macOS/Linux 使用 `python3` 和本机项目路径。已有构建工具且需要完全离线安装时，加 `--no-index --no-deps --no-build-isolation`；常规 pip 安装可能下载构建工具，Triad 五个命令本身不发起网络请求。
+Sol/Luna/Astra 只是兼容旧版的预设。所有职责都能重新分配；工具不代理模型请求，也不静默替换不可用模型。
 
-`smoke` **只打印提示词**。复制到 Codex 执行才可能消耗模型额度。在可信、可丢弃项目中新建会话，观察主模型、两个 worker 独立线程以及 advisor 线程；记录实际 thread/model/effort，无法确认时保留 `MODEL_NOT_VERIFIED`。详见[最小运行验收](docs/RUNTIME_VERIFICATION.md)。
+## 快速上手
 
-## 安装、升级和卸载
+需要 Python 3.11+。交互选择还需要已安装、已登录且支持 App Server `model/list` 的 Codex CLI。已实测客户端为 Windows CLI 0.163.0；其他环境见[兼容性与证据](docs/VALIDATION.md)。
 
-```powershell
-codex-triad init --project "C:\Projects\MyApp" --main-model gpt-6.1-sol --advisor-model gpt-6-astra --worker-model gpt-6-luna --main-effort high --advisor-effort high --worker-effort medium --max-subagents 3
-codex-triad uninstall --project "C:\Projects\MyApp" --dry-run
-codex-triad uninstall --project "C:\Projects\MyApp"
+克隆仓库，直接运行内置 CLI，无需安装 Python 包：
+
+```bash
+git clone https://github.com/ruanyueheng/codex-triad.git
+cd codex-triad
+python scripts/triad.py --help
 ```
 
-维护范围：`AGENTS.md` 中标记块、`.codex/config.toml` 中精确登记的新增行、四个 `.codex/agents/triad_*.toml` 和 `triad-state.json`。用户原有设置保留并提示冲突；`--force` 仅能覆盖清单已登记的 Agent 文件或策略块，不能认领未知文件，也不能覆盖改过的配置行。
+在此目录创建一个可丢弃的目标项目，先选模型并预览，再安装：
 
-实际操作有进程锁、逐文件原子替换与恢复记录。Windows 已有文件保留 DACL，新文件/临时备份限制为仅所有者访问；不同运行身份需要单独配置访问权限。正常失败会尝试回滚；进程中断后先检查本地备份，再运行：
-
-```powershell
-codex-triad init --project "C:\Projects\MyApp" --recover
+```bash
+mkdir ../triad-demo
+python scripts/triad.py init --project ../triad-demo --interactive --dry-run
+python scripts/triad.py init --project ../triad-demo --interactive
+python scripts/triad.py doctor --project ../triad-demo --json
 ```
 
-`--recover` 仅恢复，不继续安装；卸载也可使用该参数。后续编辑与恢复内容冲突时拒绝覆盖。`.codex/.triad-transaction.json` 是临时本地备份，可能含原配置敏感值，不是加密文件，不应上传。完成后删除；空目录与 `.triad.lock` 保留。[安全写入设计](docs/ADR-001-SAFE-INSTALL.md)
+Windows 可将 `python` 换成 `py -3`；macOS/Linux 按需使用 `python3`。预览不保存选择，第二条命令会重新询问。目录查询可能访问配置的服务，但不会发起生成 turn；出现在列表中不等于该账户已实测调用成功。
 
-`init --dry-run` 展示差异且不写文件；`uninstall --dry-run` 列出移除/恢复/保留范围。预览可能包含目标文件中的编辑内容，分享前请脱敏。损坏的 TOML、清单、符号链接、junction、硬链接以及无法证明安全的特殊 TOML 布局会被拒绝。
+然后检查生成文件，在 Codex 中打开**目标项目**，审阅后再信任并新建会话。给协调器一项确实需要探索和审查的任务，观察实际子 Agent 活动；安装完成不代表已经启动 Agent。
 
-## 诊断和工作流边界
+暂时没有 CLI 或网络？先走[离线演练](docs/GETTING_STARTED.md#offline-walkthrough)。也可以选择[虚拟环境安装](docs/GETTING_STARTED.md#optional-python-package-installation)，使用 `python -m codex_triad` 的五个命令。本项目尚未发布到 PyPI。
 
-`doctor --json` 返回检查数组，每项含 `level/code/message`。PASS 只说明该静态项目通过；FAIL 是错误；WARN 是冲突/需检查；UNKNOWN 包括客户端功能、项目信任、有效模型与真实运行。退出码：0 为无 FAIL（仍可能 UNKNOWN），1 为诊断失败，2 为操作错误/参数错误。
+## 作为 skill 使用
 
-主会话负责修改源码。Agent 输入应包含目标、范围、证据、约束和期望输出；各角色输出格式见[架构契约](docs/ARCHITECTURE.md)。Astra 检查点是 **advisory/prompt-based**，不是运行时门禁。当前不安装 hook，不修改全局模型/代理/权限，不读取凭据，不上传日志，不自动发起模型调用。
+仓库根目录包含 `SKILL.md` 和配套运行文件。仅克隆到任意目录，不等于已经注册到 Codex 技能列表。
 
-配置文件中的模型/effort 会覆盖该 Agent 的默认解析值；CLI、信任项目、profile 等层级仍影响父会话。工具不读取全局配置来猜测有效值。[官方配置核对](docs/OFFICIAL_COMPATIBILITY.md)
+把构建得到的 `codex-triad-<version>-skill.zip` 解压到目标仓库的 `.agents/skills/`，保留 `.agents/skills/codex-triad/SKILL.md`、`scripts/`、`src/`、`docs/` 和 `evaluation/`。然后调用：
 
-## 评测与开发
-
-```powershell
-py -3 -m unittest discover -s tests -v
-codex-triad report --csv path/to/measured-runs.csv --json
-py -3 -m compileall -q src tests tools
-py -3 tools/build_release.py
-py -3 tools/check_wheel.py
+```text
+$codex-triad
+检查本项目的模型分配，然后修复失败测试。
+在有帮助时使用有限范围的工作者，保留单一代码实现负责人，
+并让已配置的顾问审查真实差异和测试结果。
 ```
 
-`report` 只汇总手工提供的观测数据；保留旧 CSV 兼容性，支持上下文量、子线程数、质量评分和实验元数据。缺失指标用 JSON null / 文本 UNKNOWN，不推算成本。模板与五类任务见 [evaluation](evaluation/tasks.json) 和[评测规范](docs/EVALUATION.md)。
+也可直接要求 Codex 读取克隆仓库中 `SKILL.md` 的绝对路径。参见[技能安装、案例与移除](docs/GETTING_STARTED.md#use-the-skill)。本地技能发现机制依据 [Codex 官方文档](https://learn.chatgpt.com/docs/build-skills)。
 
-[验证结果/未验证项](docs/work/VALIDATION_REPORT.md) · [风险清单](docs/work/AUDIT_FINDINGS.md) · [修改清单](docs/work/CHANGE_SUMMARY.md) · [故障排查](docs/TROUBLESHOOTING.md) · [贡献指南](CONTRIBUTING.md) · [发布检查单](docs/PUBLISHING.md) · [路线图](docs/ROADMAP.md)
+## 会修改什么
 
-许可证：[MIT](LICENSE)。名称/商标冲突、维护者联系方式及远端 CI 仍须发布前确认；此前本地交付之后，已获授权上传正式私有仓库；公开发布另行确认。
+Triad 维护 `AGENTS.md` 标记块、`.codex/config.toml` 中登记的新增内容、四份角色 TOML 和所有权清单。已有设置会保留；未知同名文件会触发拒绝。用 `doctor` 检查冲突，`--force` 不能覆盖无关配置。
+
+```bash
+python scripts/triad.py uninstall --project ../triad-demo --dry-run
+python scripts/triad.py uninstall --project ../triad-demo
+```
+
+卸载保留用户修改过的文件，并报告部分卸载；可能留下空目录和锁文件。中断写入需显式恢复，详见[安全存储设计](docs/ADR-001-SAFE-INSTALL.md)。
+
+## 已验证的能力
+
+- 单元和集成测试覆盖配置合并、原文保留、回滚、并发、模型选择及运行证据的反例。
+- CI 覆盖 Windows/Linux、Python 3.11–3.14，构建发行包，并验证干净 wheel 和独立 skill。
+- 独立 CLI App Server 实测取得角色、父子线程、模型活动与执行顺序证据。另一次修复案例通过 20 项项目测试和 7 项独立检查。
+- 这些结果不能证明后端独立模型身份、所有账户权限、强制审查或费用下降。[验证报告](docs/VALIDATION.md) 保留了尚未定位来源的桌面配置持久化现象。
+
+对仓库内的真实脱敏证据进行离线核验：
+
+```bash
+python scripts/triad.py report --runtime-evidence evaluation/cli-runtime-20261023.json --json
+```
+
+`doctor` 检查静态配置，`smoke` 打印提示词，两者都不证明模型调用成功。真实采集需要主动启用，会消耗额度；要求隔离时使用单独配置的 `CODEX_HOME`。参见[原生运行验收](docs/CLI_NATIVE_VERIFICATION.md)。
+
+## 文档与贡献
+
+[模型分配](docs/MODEL_ASSIGNMENT.md) · [架构](docs/ARCHITECTURE.md) · [评测](docs/EVALUATION.md) · [路线图](docs/ROADMAP.md) · [变更记录](CHANGELOG.md)
+
+```bash
+python -m pip install -e .
+python -m unittest discover -s tests -v
+python tools/build_release.py
+python tools/check_wheel.py
+```
+
+运行时只依赖 Python 标准库，构建需要 setuptools 和 wheel。环境与产物检查见[贡献指南](CONTRIBUTING.md)。本机构建文件位于 `dist/`，成功的 CI 运行也会保留预览产物。
+
+通过 [Issues](https://github.com/ruanyueheng/codex-triad/issues/new/choose) 报告问题；涉及敏感信息时按[安全策略](SECURITY.md) 私下报告，不要上传完整日志。欢迎改进可复现性与兼容性。
+
+[MIT 许可证](LICENSE)。文档组织参考 [uv](https://github.com/astral-sh/uv)、[ripgrep](https://github.com/BurntSushi/ripgrep) 和 [Anthropic Skills](https://github.com/anthropics/skills)，不代表获得这些项目的认可或背书。

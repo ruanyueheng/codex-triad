@@ -14,6 +14,7 @@ from codex_triad.evidence import verify_runtime
 from codex_triad.appserver import Client
 from codex_triad.installer import _previous_settings, _read_state
 from codex_triad.storage import assert_safe_paths, _restrict_windows_temp
+from codex_triad import __version__
 
 
 
@@ -48,7 +49,7 @@ def main():
     try:
         with (output / "server.stderr.txt").open("w", encoding="utf-8") as stderr:
             client = Client(executable, project, environment, stderr)
-            client.call("initialize", {"clientInfo": {"name": "codex-triad-verifier", "version": "0.2.0a2"}, "capabilities": {"experimentalApi": True}})
+            client.call("initialize", {"clientInfo": {"name": "codex-triad-verifier", "version": __version__}, "capabilities": {"experimentalApi": True}})
             client.send({"method": "initialized", "params": {}})
             started = client.call("thread/start", {"cwd": str(project), "model": settings.main_model, "ephemeral": False,
                 "sandbox": "read-only", "approvalPolicy": "never", "multiAgentMode": "explicitRequestOnly",

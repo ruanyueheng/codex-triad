@@ -12,6 +12,8 @@ ROOT_FILES = ("pyproject.toml", "MANIFEST.in", ".gitignore", "LICENSE", "SKILL.m
               "WORK_HANDOFF.md", "WORK_START_HERE.md", "WORK_PROMPT.txt", "task_plan.md", "findings.md", "progress.md")
 SOURCE_DIRS = {"src/codex_triad": {".py"}, "tests": {".py"}, "tools": {".py"},
                "docs": {".md"}, ".github": {".md", ".yml"}, "evaluation": {".csv", ".json"}, "scripts": {".py"}}
+SKILL_REFERENCES = {"SKILL.md", "LICENSE", "docs/CLI_NATIVE_VERIFICATION.md", "docs/MODEL_ASSIGNMENT.md",
+                    "docs/ADR-001-SAFE-INSTALL.md", "evaluation/cli-runtime-20261023.json"}
 
 
 def source_files():
@@ -49,11 +51,15 @@ def main():
     skill = output / f"codex-triad-{version}-skill.zip"
     with zipfile.ZipFile(skill, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in source_files():
-            archive.write(path, f"codex-triad/{path.relative_to(ROOT).as_posix()}")
+            relative = path.relative_to(ROOT)
+            if relative.parts[0] in {"src", "scripts"} or relative.as_posix() in SKILL_REFERENCES:
+                archive.write(path, f"codex-triad/{relative.as_posix()}")
     with zipfile.ZipFile(skill) as archive:
         assert "codex-triad/SKILL.md" in archive.namelist()
         assert "codex-triad/scripts/triad.py" in archive.namelist()
         assert "codex-triad/src/codex_triad/evidence.py" in archive.namelist()
+        assert not any(n.startswith(("codex-triad/tests/", "codex-triad/tools/", "codex-triad/docs/work/"))
+                       for n in archive.namelist())
     hashes = [f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}" for p in (wheel, source, skill)]
     (output / "SHA256SUMS.txt").write_text("\n".join(hashes) + "\n", encoding="utf-8")
     print("\n".join(hashes))

@@ -1,27 +1,26 @@
 # GitHub publication checklist / 发布清单
 
-The project archive is a **local source distribution**, not a published GitHub repository. Publishing is a separate, explicit maintainer action.
+Repository: [ruanyueheng/codex-triad](https://github.com/ruanyueheng/codex-triad). Visibility changes and releases require explicit maintainer authorization. Making source public is separate from publishing a GitHub Release or a PyPI package.
 
-1. Choose an available repository name, e.g. `codex-triad`; check GitHub search and trademarks. Decide owner and repository URL.
-2. Set the actual maintainer name and contact method. Setup documentation uses local source paths until a real repository URL exists. Review `SECURITY.md` so vulnerability reports reach a private channel; enable GitHub private vulnerability reporting if available.
-3. Inspect `git status` and make sure there are no local API keys, `.env`, transcripts, private datasets, auth files, billing details or proxy configurations. Check `git diff --cached` before every push.
-4. Run `python -m pip install -e .`, `python -m unittest discover -s tests -v`, `python -m compileall -q src tests tools`, `python tools/build_release.py` and `python tools/check_wheel.py`. Inspect the source ZIP and SHA256SUMS. Build tools must already be installed for offline builds.
-5. Perform a **real local Codex smoke test** in a trusted *throwaway* repo using all three models. Record the Codex version, actual effective model selection and any provider/routing errors without including secrets.
-6. Enable GitHub Actions and verify Windows/Linux CI passes. Create GitHub issue labels and a `good first issue` task. Review the license and attribution.
-7. Keep `v0.2.0a1` a pre-release until 3-model runtime verification and a complete uninstall/upgrade walkthrough are documented. Avoid claiming guaranteed autonomous gating or cost savings.
-8. Once verified, publish a release tag and a short, reproducible announcement with explicit limitations, screenshots, and benchmark raw data.
+1. Inspect the Git diff and **all reachable history**, not only current/ignored files, for secrets and private data. A pattern scan is not a complete security audit.
+2. Keep logs, authentication, Codex homes and recovery journals outside the repository; confirm archives contain only reviewed paths.
+3. Run unit tests, compile checks, artifact build, clean wheel and extracted skill checks. Exercise the documented offline lifecycle in a fresh directory.
+4. Verify Windows/Linux × Python 3.11–3.14 CI for the exact commit. Separate static checks, runtime metadata and unverified backend claims.
+5. If authorized live checks are needed, use a separate child CODEX_HOME, a disposable trusted project and private output. Compare local global-config hashes before/after.
+6. Review MIT attribution, README links, package version, changelog and issue/security routes. Do not imply OpenAI endorsement, trademark clearance or measured savings.
+7. Push the reviewed commit and change visibility only after verification. Enable private vulnerability reporting when supported, then verify anonymous repository access.
 
-## Optional local Git steps (do not run blindly on user projects)
+## For a later release
+
+Update the version in `pyproject.toml` and `src/codex_triad/__init__.py`, release notes and versioned examples. Build with installed setuptools/wheel:
 
 ```bash
-cd codex-triad
-git init
-git add .
-git diff --cached --stat
-git commit -m "feat: initial Codex Triad alpha"
-# Create GitHub repository yourself, then set its remote and push.
+python tools/build_release.py
+python tools/check_wheel.py
 ```
 
-License: MIT. This repository is community-maintained and is not endorsed by OpenAI.
+Review the wheel, source ZIP, lean skill ZIP and SHA256SUMS. Tag/upload only after explicit release authorization; do not create a PyPI listing as a side effect. Keep alpha releases marked prerelease until compatibility justifies a stable label.
 
-当前发布阻塞：名称/商标及包名可用性未审定，维护者私密联系方式未配置，远端 CI 未运行，真实三模型烟测/费用/截图未取得。它们不会阻碍本地源码交付，但不应伪称发布准备全部完成。本次没有运行上面的 Git 命令，也没有创建公开仓库、push、部署或 Release。
+## Documentation references
+
+README organization draws from [uv](https://github.com/astral-sh/uv) (scope and quick start), [ripgrep](https://github.com/BurntSushi/ripgrep) (navigation, reproducible evidence and limitations) and [Anthropic Skills](https://github.com/anthropics/skills) (self-contained skills and concrete examples). These are organizational references, not copied implementation or endorsements.

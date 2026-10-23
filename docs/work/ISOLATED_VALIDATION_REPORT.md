@@ -18,7 +18,7 @@
 
 ## 隔离方式
 
-独立目录：`E:/University/Github/我的/codex-triad-validation/20261023-34e47d23/`。
+独立目录：`<private-validation-root>/`，实际本机位置不在公开说明中列出。
 
 - source/：从已审阅 ZIP 提取的独立 Git 快照，用于私有远端 CI。
 - runtime-project/：只有 app.py、README 和局部 .codex/AGENTS.md 的小型测试项目。
@@ -47,9 +47,9 @@
 
 ## 远端证据
 
-- 私有仓库：[隔离验证仓库](https://github.com/ruanyueheng/codex-triad-validation-20261023-34e47d23)。
-- [CI 完整运行](https://github.com/ruanyueheng/codex-triad-validation-20261023-34e47d23/actions/runs/39891519133)；commit `5c0de5dc91d10a12f22cf1f57635b2069860dab6`。
-- [草稿 Release](https://github.com/ruanyueheng/codex-triad-validation-20261023-34e47d23/releases/tag/untagged-e8113b3e6b48ae7ee6e9)，三个附件下载摘要一致；没有公开发布，也没有发布到 PyPI。
+- 私有验证仓库和草稿链接保留在本机，不作为公开用户入口。
+- 历史 CI 运行标识 `39891519133`；commit `5c0de5dc91d10a12f22cf1f57635b2069860dab6`。
+- 私有草稿三个附件下载摘要一致；这只是历史隔离验证，不是正式项目 Release，也没有发布到 PyPI。
 
 上传内容只有已审阅的 54 文件源码快照和发行附件；没有上传运行日志、全局配置、auth 文件或密钥。保留私有仓库和草稿供用户复核，没有自动删除它们。
 

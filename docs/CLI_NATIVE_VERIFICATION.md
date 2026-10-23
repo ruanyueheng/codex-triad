@@ -58,8 +58,10 @@ python scripts/collect_runtime.py --project PATH --output NEW_PRIVATE_DIRECTORY 
 
 ## Skill 与 GitHub
 
+0.2.0a4 公开预览前，另从精简 skill ZIP 在独立目录实跑交互预览、选模安装、doctor、原生采集及卸载；两个 Luna 角色重叠执行，Astra 在其后审查，核验 PASS。使用独立子进程 CODEX_HOME；全局 config.toml 测试前后 SHA-256 一致，本次临时认证引用已移除。此结果只验证受控 CLI 路径，不解释或抵消此前桌面配置变化的未知根因。
+
 仓库根目录即一个自包含 `codex-triad` skill：SKILL.md、scripts/、src/ 和按需文档保持同级。无须先全局 pip 安装。发布包提供以 codex-triad/ 为顶层的 skill ZIP；未来安装时选择整个 skill 根目录，不能只复制 SKILL.md。
 
-当前只在仓库内准备 skill，没有写入用户全局技能目录，也没有公开发布。GitHub 的最终 owner/仓库、可见性、版本与发布授权应在正式上传前明确。旧私有测试仓库的成功 CI 对应其原快照，不等同于本版新增代码已通过远端 CI。
+正式仓库为 [ruanyueheng/codex-triad](https://github.com/ruanyueheng/codex-triad)，对应提交的 CI 状态以该仓库 Actions 为准。skill ZIP 只保留运行文件和所需参考，不包含研发历史；可解压到目标仓库 `.agents/skills/` 后调用。没有自动安装到全局技能目录。公开源码与创建 Release/PyPI 包是不同操作；后者仍需明确授权。
 
-English: the local CLI App Server now supplies observed role, parent/child thread and model activity evidence. The verifier joins startup and completion records instead of trusting assistant claims or empty waits. Model evidence is client runtime selection, not independent backend identity. Runtime collection is opt-in and quota-consuming; offline verification makes no model calls. The repository is prepared as a self-contained skill but has not been installed globally or publicly published.
+English: the local CLI App Server supplies observed role, parent/child thread and model activity evidence. The verifier joins startup and completion records instead of trusting assistant claims or empty waits. Model evidence is client runtime selection, not independent backend identity. Runtime collection is opt-in and quota-consuming; offline verification makes no model calls. The standalone skill contains the runtime and required references and can be installed in a target repository without changing global skill/configuration files.

@@ -33,5 +33,17 @@ jobs:
         run: python -m compileall -q src tests tools scripts
       - name: Build and inspect release artifacts
         run: python tools/build_release.py
-      - name: Install wheel in a clean environment
+      - name: Verify wheel and standalone skill
         run: python tools/check_wheel.py
+      - name: Upload preview artifacts
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-triad-preview
+          path: |
+            dist/*.whl
+            dist/*-source.zip
+            dist/*-skill.zip
+            dist/SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 14

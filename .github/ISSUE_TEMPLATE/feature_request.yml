@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a concrete workflow or compatibility improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe a real task and what currently gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested behavior and alternatives
+      description: Include compatibility, configuration and permission implications if relevant.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Relevant platform and Codex client/version

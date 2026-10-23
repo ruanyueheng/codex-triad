@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0a4 — 2026-10-23 · Public preview preparation
+
+- Rebuild bilingual onboarding, repository-scoped skill instructions and current validation documentation.
+- Separate the standalone skill archive from development history; verify it without site-packages alongside the clean wheel.
+- Add public project metadata, issue/security routes and downloadable CI preview artifacts.
+- Document the unresolved desktop setting observation and dedicated-CODEX_HOME isolation requirement without attributing an unproven cause.
+
 ## 0.2.0a3 — User-selected role models
 
 - Add opt-in interactive role/model/effort picker using paginated App Server model/list. No generation turns are started.

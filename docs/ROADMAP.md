@@ -10,7 +10,7 @@ Status markers: `[x]` implemented, `[ ]` proposed (not promised).
 - [x] Bounded delegated result contracts.
 - [x] Smoke prompts for real subagent validation.
 - [x] Windows/Linux CI and unit tests.
-- [ ] User-reported end-to-end model-selection confirmation on supported Codex desktop/CLI builds.
+- [x] Native CLI model/role/thread confirmation on the tested Windows CLI 0.163.0 account; not a universal compatibility claim.
 
 ## v0.2.0a1 — Safe writes and reproducible local delivery
 
@@ -22,10 +22,14 @@ Status markers: `[x]` implemented, `[ ]` proposed (not promised).
 
 ## Next — Opt-in observability and evaluation
 
-- [ ] Opt-in, privacy-aware runtime evidence collector for agent/model/thread IDs (only where supported by Codex).
+- [x] Opt-in, privacy-aware runtime evidence collector for agent/model/thread IDs (only where supported by Codex).
 - [ ] Reproducible A/B harness for tasks and real token/cost comparison.
 - [ ] Version compatibility matrix with pinned client builds and accepted model IDs.
 - [x] Better config migration/rollback reports and conflict inspection.
+- [x] User-selected models and reasoning efforts, including model reuse across responsibilities.
+- [x] Standalone skill archive with isolated, site-packages-free lifecycle verification.
+- [ ] Identify the source of the desktop global-setting change documented in [validation](VALIDATION.md).
+- [ ] Additional account/client-version reports and macOS native integration.
 
 ## v0.3 — Reliable policy engine (research)
 

@@ -2,7 +2,7 @@
 
 ## Scope
 
-Triad 0.2.0a2 is a **generator/installer for native Codex custom agents**. It does not run the model server, intercept calls, measure actual tokens, or force event-driven delegation. Instructions in `AGENTS.md` are a *behavioral request*, not a deterministic scheduler.
+Triad 0.2.0a4 is a **generator/installer for native Codex custom agents**. It does not run the model server, intercept calls, measure actual tokens, or force event-driven delegation. Instructions in `AGENTS.md` are a *behavioral request*, not a deterministic scheduler.
 
 中文入口：[安全写入 ADR](ADR-001-SAFE-INSTALL.md)、[官方配置与 P2 调查](OFFICIAL_COMPATIBILITY.md)、[运行验收](RUNTIME_VERIFICATION.md)。
 
@@ -13,6 +13,9 @@ Triad 0.2.0a2 is a **generator/installer for native Codex custom agents**. It do
 - `installer.py`: ownership, configuration merge, change planning and uninstall reports.
 - `storage.py`: shared path guards, OS lock, snapshot comparison, atomic replacement, local journal and rollback/recovery.
 - `checker.py`: static diagnostics using the same ownership/path checks; runtime facts remain UNKNOWN.
+- `models.py`: explicit model catalog queries and role/effort selection; no generation turns.
+- `appserver.py`: shared installed-client JSON-RPC transport.
+- `evidence.py`: offline role/thread/lifecycle verification for supplied records.
 - `benchmark.py`: user-supplied offline measurements; missing totals remain unknown, no telemetry collection.
 
 实际文件操作是运行时代码；Agent 路由、角色只读和 Astra 检查点是提示词约定。多文件事务可恢复，不提供同时可见性或抵御本地恶意写入的安全边界。
@@ -48,7 +51,7 @@ Each report separates direct evidence, inference and unknowns. A failed spawn is
 | Nontrivial pre-commit review | Provide diff, relevant tests, constraints | Call |
 | No agent tool or model authorization | Explicitly disclose limitation and use an honest single-agent fallback | Unavailable |
 
-Astra outputs one of `APPROVE`, `APPROVE_WITH_CONDITIONS`, `BLOCK`, `INSUFFICIENT_EVIDENCE`. It provides evidence-backed findings, **not a machine-enforced approval**. If risks are blocking, the coordinator should not conceal them.
+The configured advisor outputs one of `APPROVE`, `APPROVE_WITH_CONDITIONS`, `BLOCK`, `INSUFFICIENT_EVIDENCE`. It provides evidence-backed findings, **not a machine-enforced approval**. If risks are blocking, the coordinator should not conceal them.
 
 ## Isolation and concurrency
 

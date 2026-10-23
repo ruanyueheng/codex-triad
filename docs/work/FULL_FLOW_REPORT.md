@@ -17,7 +17,7 @@
 
 ## 真实案例
 
-目录：`E:/University/Github/我的/codex-triad-validation/20261023-34e47d23/endtoend-project/`。
+目录：`<private-validation-root>/endtoend-project/`，实际本机位置不作为公开使用路径。
 
 原程序将“优惠比例”误当“支付比例”。[100,150] 等数组的折后总价应乘 (1-discount)；实际测试使用 [100,50]、20% 折扣，应为 120，修复前得到 30。
 
@@ -29,7 +29,7 @@
 修复前真实运行 4 项测试、3 项失败；修复后 Sol 和父协调器分别执行，均为 4 项通过。原测试内容没有改动。结构化结果在案例目录 E2E_RESULT.json，父进程原始测试输出在 evidence/e2e-independent-tests.txt。
 
 ```powershell
-& 'E:\University\Github\我的\codex-triad-validation\20261023-34e47d23\venv\Scripts\python.exe' -m unittest discover -s 'E:\University\Github\我的\codex-triad-validation\20261023-34e47d23\endtoend-project' -v
+python -m unittest discover -s "<private-validation-root>/endtoend-project" -v
 ```
 
 ## 独立 CLI 路径：仍不能宣布通过

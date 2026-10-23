@@ -6,7 +6,7 @@ Security issues affecting `main` or the latest tagged release are accepted for t
 
 ## Responsible disclosure
 
-For suspected secrets exposure, unsafe file overwrites or permission bypass, **do not** include credentials or full private configurations in a public issue. Ask the repository maintainer for a private contact/security-advisory channel after they configure it, or submit a sanitized minimal reproduction.
+For suspected secrets exposure, unsafe file overwrites or permission bypass, use [private vulnerability reporting](https://github.com/ruanyueheng/codex-triad/security/advisories/new). Include a minimal reproduction, affected version and impact; **do not** include credentials or full private configurations. If that channel is unavailable, open only a sanitized issue asking for private contact without revealing exploit details or secrets.
 
 ## Intended protections
 
@@ -14,6 +14,7 @@ For suspected secrets exposure, unsafe file overwrites or permission bypass, **d
 - Existing project config values are preserved. Unknown colliding files are refused even with `--force`; force applies only to manifest-owned agent files/policy blocks.
 - The installer stores a small local state JSON recording settings/model IDs and checksums; no tokens or original private config copies.
 - `doctor` is static; it does not make paid calls or inspect private credential stores.
+- `init --interactive` explicitly queries the authenticated client's model catalog and may contact its configured service; it starts no generation turns. The optional runtime collector starts paid calls only with `--run` and uses the normal client authentication.
 - `uninstall` removes managed text and unmodified generated files; user-modified agent files are retained.
 - Mutations use an OS lock, snapshot checks, atomic replacement and a local recovery journal. The temporary `.codex/.triad-transaction.json` contains before/after data in base64, **not encryption**; it may include private project configuration. Never upload or commit it. Normal completion deletes it; interrupted operations require explicit `--recover`. Windows staging/new files use a protected owner-only DACL before data is written; existing targets use ReplaceFileW to preserve their DACL. A different runtime identity needs explicitly configured access. Protect the project directory.
 - Symlinks, Windows reparse points/junctions, hardlinks and non-ordinary target files are rejected. The lock coordinates Triad processes, not arbitrary external writers. Power-loss durability, network filesystems and hostile path-swap races are not guaranteed. See [ADR-001](docs/ADR-001-SAFE-INSTALL.md).
@@ -25,6 +26,7 @@ For suspected secrets exposure, unsafe file overwrites or permission bypass, **d
 3. Agents may read untrusted docs or repository text; prompt injection from third-party content remains possible. Inspect actions and keep permission prompts enabled.
 4. A local project must be trusted for its `.codex` config to load. Trust **only repositories you inspected**. User authorization and workspace policy supersede these templates.
 5. This repository does **not** guarantee a particular model, cost reduction, result correctness, or secure behavior across all intermediary API gateways.
+6. A desktop collaboration exercise observed a global reasoning-setting change with an unresolved source. The original file was restored by exact hash. For configuration-isolated tests, use a separately configured child `CODEX_HOME`, not desktop model/effort overrides. See [validation](docs/VALIDATION.md).
 
 中文：恢复记录是本地敏感备份，正常完成即删除；未完成时请离线保护。不要把它当加密文件或上传诊断日志。工具不读取密钥文件，不改变全局配置。`--force` 不认领未知文件。角色权限继承、提示词门禁和文件竞态边界见上文及 ADR。
 

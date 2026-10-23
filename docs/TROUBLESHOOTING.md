@@ -16,6 +16,9 @@
 | 权限/杀毒占用 | 关闭占用目标文件的程序，确认项目目录可写；回滚失败时保护恢复记录 |
 | doctor exit 0 但不能启动 | 0 只代表无静态 FAIL；UNKNOWN 不表示运行成功。检查信任、客户端、账户与模型访问 |
 | 版本探测 UNKNOWN | CLI 可能不在 PATH，桌面仍可能可用；doctor 不由版本号推断功能支持 |
+| `--interactive` 的 App Server 启动失败 | 查看原始错误；桌面全局配置可能包含当前 CLI 不支持的字段或 MCP transport。使用单独配置并通过正常客户端登录的 Codex home，再传 `--codex-home PATH`，不要改全局配置来掩盖兼容性错误 |
+| skill 未出现在选择器中 | 检查目标仓库 `.agents/skills/codex-triad/SKILL.md` 与配套目录；单纯克隆源码不等于注册。按需重启 Codex，或先显式引用 SKILL.md 的绝对路径 |
+| smoke 后没有子线程 | smoke 只打印提示词；在已授权、已信任的目标会话中执行才会启动真实调用 |
 | 模型/线程无法确认 | 保留 MODEL_NOT_VERIFIED；不要用模型自述或 TOML 代替可信运行证据 |
 | 子 Agent 失败 | 记录原始错误、请求角色、客户端版本；明确说明退回主线程，不模拟子线程成功 |
 
