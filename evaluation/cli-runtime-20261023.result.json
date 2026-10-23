@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "root_thread_id": "01a1674c-8239-77f3-b5dc-7a9074d5a80a",
+  "root_model": "gpt-6.1-sol",
+  "roles": {
+    "triad_architect": {
+      "thread_id": "01a1674c-f38a-76b0-917d-ed963cfa0be7",
+      "model": "gpt-6-astra",
+      "started_ms": 1792734459103,
+      "completed_ms": 1792734469381
+    },
+    "triad_researcher": {
+      "thread_id": "01a1674c-c137-7300-9b2e-c9d8c8f4e9c9",
+      "model": "gpt-6-luna",
+      "started_ms": 1792734446185,
+      "completed_ms": 1792734450600
+    },
+    "triad_explorer": {
+      "thread_id": "01a1674c-b3a9-73d2-aaa9-b2712b70eba0",
+      "model": "gpt-6-luna",
+      "started_ms": 1792734442762,
+      "completed_ms": 1792734448931
+    }
+  },
+  "model_evidence": "CLIENT_RUNTIME",
+  "backend_identity": "UNKNOWN",
+  "notice": "Validates supplied protocol records, not their authenticity or account-wide availability."
+}

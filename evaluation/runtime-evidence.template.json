@@ -1,0 +1,18 @@
+{
+  "case_id": "WORKERS-001",
+  "date": "UNKNOWN",
+  "platform": "UNKNOWN",
+  "codex_client": "UNKNOWN",
+  "codex_version": "UNKNOWN",
+  "account_provider": "masked",
+  "main_model_effective": "MODEL_NOT_VERIFIED",
+  "subagents_requested": ["triad_explorer", "triad_researcher"],
+  "subagents_observed": [],
+  "thread_ids": [],
+  "models_effective": "MODEL_NOT_VERIFIED",
+  "reasoning_effort_effective": "UNKNOWN",
+  "outcome": "NOT_RUN",
+  "observed_error": "NONE",
+  "raw_evidence_location": "NONE",
+  "secrets_removed": true
+}

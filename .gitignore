@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.coverage
+.idea/
+.vscode/
+# Users installing Triad in their own repo may have private local config.
+.codex/.triad-backups/
+.codex/.triad-transaction.json
+.codex/.triad-*.tmp
+.codex/.triad.lock
+.env
+.env.*
+
+# Machine-local test-directory pointer, not publication material.
+docs/work/ISOLATION_LOCATION.txt

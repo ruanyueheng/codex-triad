@@ -1,0 +1,14 @@
+include LICENSE README.md README.zh-CN.md SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md CHANGELOG.md RELEASE_NOTES.md
+include WORK_HANDOFF.md WORK_START_HERE.md WORK_PROMPT.txt task_plan.md findings.md progress.md
+include SKILL.md
+recursive-include scripts *.py
+recursive-include docs *.md
+recursive-include evaluation *.csv *.json
+recursive-include .github *.yml *.md
+recursive-include tests *.py
+recursive-include tools *.py
+global-exclude *.pyc
+prune dist
+prune build
+prune .codex
+prune .venv

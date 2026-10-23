@@ -1,0 +1,11 @@
+{
+  "status": "PROTOCOL_ONLY_NOT_RUN",
+  "prompt_version": "triad-eval-v1",
+  "tasks": [
+    {"id": "entry", "prompt": "Locate CLI entry points and trace init to file writes; cite file/symbol evidence.", "acceptance": "Every call edge exists; no writes."},
+    {"id": "dependency", "prompt": "Check build metadata against declared minimum setuptools; identify compatibility requirements.", "acceptance": "Version-specific primary/local evidence and reproducible build check."},
+    {"id": "repeat-failure", "prompt": "Given two failed fixes with the same provided signature, explain root-cause evidence and request advisor review.", "acceptance": "Distinguish evidence from hypotheses; preserve original errors; one discriminating next test."},
+    {"id": "cross-module", "prompt": "In an isolated task snapshot, add a documented CSV metric across parser, CLI output and tests.", "acceptance": "Legacy CSV works; unknown values remain unknown; focused regression passes."},
+    {"id": "pre-commit", "prompt": "Review an actual isolated diff and observed tests for overwrite/rollback regressions; do not commit.", "acceptance": "Evidence-backed verdict, blockers, risks, next actions and unknowns."}
+  ]
+}

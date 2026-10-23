@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codex-triad"
+version = "0.2.0a3"
+description = "Safe project-local three-tier Codex subagent configuration and diagnostics"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "Codex Triad contributors"}]
+keywords = ["codex", "subagent", "multi-agent", "orchestration", "openai"]
+classifiers = ["Programming Language :: Python :: 3", "Operating System :: OS Independent"]
+
+[project.scripts]
+codex-triad = "codex_triad.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

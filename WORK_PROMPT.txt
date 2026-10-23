@@ -1,0 +1,12 @@
+请在当前已打开的 Codex Triad 仓库内继续完善该开源项目。请把仓库根目录的 WORK_HANDOFF.md 作为主任务书，依次阅读 README.zh-CN.md、docs/ARCHITECTURE.md、docs/work/REQUIREMENTS_AND_DESIGN.md、docs/work/ACCEPTANCE_CHECKLIST.md、docs/work/CURRENT_STATUS_AND_RISKS.md，然后逐文件审查 src/codex_triad/、tests/、.github/ 中的源码与配置。
+
+项目目标：实现可维护、可验证的三级 Codex 多 Agent 工作流：gpt-6.1-sol 负责主协调和代码实现；gpt-6-luna 负责并行代码探索、依赖文档研究、故障定位；gpt-6-astra 只在关键架构决策、连续同类失败、重要提交前审查时参与。上述模型能否在当前 Codex 账户、客户端和服务商下实际调用，必须通过真实证据验证，不得推定。
+
+执行优先级：
+P0：核对当前官方 Codex 子 Agent 配置/模型参数及配置优先级；运行原有测试；审计 CLI 的安全安装、可逆卸载、原有配置合并、Windows 路径和冲突保护，修复并补测试。
+P1：完善 init/doctor/smoke/uninstall/report；区分静态检测与真实运行；提供 Agent 实际模型与线程验证方案；增加跨平台 CI、集成测试和中英文文档。
+P2：调查是否能基于可靠事件 hook/SDK 实现程序强制 Astra 审查门禁和准确用量统计；没有稳定接口则记录限制，不要以提示词模拟强制执行。
+
+请实际修改代码、运行可用测试、提供日志摘要与修改清单；保持现有 CLI 兼容。默认不读取密钥、不更改我的 Codex 全局模型/代理/权限配置、不做隐式外部请求、不上传日志或敏感文件。真实模型调用如果无法访问本地 Windows Codex，请写明 NOT_VERIFIED，提供可在我的 PowerShell 中复现的命令和验收步骤。
+
+先输出精炼的风险清单和执行计划，随后直接实施 P0/P1；仅在涉及外部发布、不可逆操作或授权时向我确认。不要创建公开 GitHub 仓库、push 或发布 Release，除非我明确授权。最后交付完整仓库、测试结果、差异清单、未验证清单和下一阶段路线图。文档中文优先，保留英文 README。
