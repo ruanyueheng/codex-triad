@@ -10,7 +10,7 @@ Choose one route: the bundled CLI configures project roles; the skill teaches Co
 - Codex CLI authenticated with your normal account for model lookup or live collection. Supported role/effort fields depend on the client; CLI 0.163.0 was tested on Windows.
 - An existing target project directory. Review it before granting trust. Unknown configuration is preserved, so check `doctor` after installation.
 
-All commands below start in the cloned `codex-triad` source directory. `python` means your chosen Python 3.11+ interpreter.
+CLI walkthroughs below start in the cloned `codex-triad` source directory. The npm installation section runs in your target project. `python` means your chosen Python 3.11+ interpreter.
 
 ## Offline walkthrough
 
@@ -51,7 +51,27 @@ If a desktop configuration contains fields or MCP transports unsupported by the 
 
 ## Use the skill
 
-The root `SKILL.md` is usable by explicit absolute-path reference. For normal repository-scoped discovery, install the **whole skill bundle** under `.agents/skills/codex-triad/` in your target repository, not under the user's home directory.
+### Install with npm / 使用 npm 安装
+
+From your target project, run:
+
+```bash
+npx skills add ruanyueheng/codex-triad --agent codex
+```
+
+The [skills CLI](https://github.com/vercel-labs/skills) downloads the skill from GitHub into `.agents/skills/codex-triad/`. It requires Node.js 22.20+. Python 3.11+ runs the bundled configuration helper.
+
+For a non-interactive copy installation:
+
+```bash
+npx --yes skills add ruanyueheng/codex-triad --skill codex-triad --agent codex --copy --yes
+```
+
+Check the installation with `npx skills list --agent codex`, then invoke `$codex-triad` in Codex. Restart Codex if the new skill has not appeared yet. The npm package supplies the installer; the skill itself comes from this repository.
+
+### ZIP or source installation
+
+You can also reference the cloned root `SKILL.md` by absolute path, or extract the whole skill ZIP into `.agents/skills/`.
 
 Build it locally with existing setuptools/wheel, or download the preview artifact from a successful [CI run](https://github.com/ruanyueheng/codex-triad/actions/workflows/ci.yml) (GitHub may require sign-in for artifact downloads):
 
@@ -88,7 +108,16 @@ Preview setup for the current repository and let me assign its three responsibil
 Preserve existing settings. Show static diagnostics and distinguish runtime unknowns.
 ```
 
-Removing roles and removing the skill are separate operations. Preview/run `uninstall` first if roles are no longer wanted. Then remove only the skill folder you installed; the CLI does not remove it. Do not delete the whole `.agents/skills/` directory.
+### Remove the skill
+
+Remove Triad's project roles from your target project:
+
+```bash
+python .agents/skills/codex-triad/scripts/triad.py uninstall --project . --dry-run
+python .agents/skills/codex-triad/scripts/triad.py uninstall --project .
+```
+
+Then delete `.agents/skills/codex-triad/` to remove the skill files.
 
 ## Optional Python package installation
 

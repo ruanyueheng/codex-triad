@@ -2,6 +2,7 @@
 
 ## 0.2.0a4 — 2026-10-23 · Public preview preparation
 
+- Lead the bilingual README with `npx skills add`, verify npm-installed helpers and add a pinned skills CLI compatibility check in CI.
 - Rebuild bilingual onboarding, repository-scoped skill instructions and current validation documentation.
 - Separate the standalone skill archive from development history; verify it without site-packages alongside the clean wheel.
 - Add public project metadata, issue/security routes and downloadable CI preview artifacts.

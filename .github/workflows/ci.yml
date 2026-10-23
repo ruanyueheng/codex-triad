@@ -21,6 +21,20 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v4
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        with:
+          node-version: '24'
+      - name: Verify npm skills installation
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+        working-directory: ${{ runner.temp }}
+        env:
+          DISABLE_TELEMETRY: '1'
+          DO_NOT_TRACK: '1'
+        run: |
+          npx --yes skills@1.7.4 add "$GITHUB_WORKSPACE" --skill codex-triad --agent codex --copy --yes
+          python -I -S -X utf8 .agents/skills/codex-triad/scripts/triad.py --help
+          python -I -S -X utf8 .agents/skills/codex-triad/scripts/triad.py report --runtime-evidence .agents/skills/codex-triad/evaluation/cli-runtime-20261023.json --json
       - name: Install package locally
         run: |
           python -m pip install "setuptools>=68" wheel

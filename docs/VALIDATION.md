@@ -8,6 +8,7 @@ This is an alpha preview. A passing static check, a successful model call, nativ
 |---|---|---|
 | Unit/integration suite | 77 tests on Windows; CI matrix covers Windows/Linux × Python 3.11–3.14 | Installer, recovery, conflicts, selection and offline evidence behavior |
 | Package checks | Clean wheel install and standalone skill archive lifecycle | Delivered artifacts work outside the checkout |
+| npm skills installation | skills CLI 1.7.4, Node 24.18.0; project installation in default and copy modes | Installed helper passed all five offline commands; CI checks npm installation and bundled imports |
 | 0.2.0a4 standalone live walkthrough | Extracted 19-file skill; real interactive preview/install/doctor, two concurrent Luna roles, Astra review, uninstall | Passed with a dedicated child CODEX_HOME; global config hashes identical, temporary auth reference removed |
 | CLI role runtime | Windows Codex CLI 0.163.0; configured Sol coordinator, Luna workers, Astra advisor | App Server roles, parent/child IDs, startup models, completion and ordering |
 | Model reuse | One model assigned to all three responsibilities, real native runtime pass | Responsibilities are not fixed to model families |
