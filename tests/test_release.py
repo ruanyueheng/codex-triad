@@ -10,7 +10,7 @@ from tools import build_release
 class ReleaseTests(unittest.TestCase):
     def test_unlisted_files_never_enter_source_selection(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
+            root = Path(temp).resolve()
             for path in build_release.source_files():
                 target = root / path.relative_to(build_release.ROOT)
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -27,7 +27,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_release_manifest_rejects_wildcards_and_missing_files(self):
         with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
+            root = Path(temp).resolve()
             for entry in ("include *.py", "recursive-include evaluation *.csv", "include missing.py",
                           "include ../outside.py"):
                 with self.subTest(entry=entry), patch.object(build_release, "ROOT", root):
