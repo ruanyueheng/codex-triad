@@ -34,7 +34,7 @@ class ModelTests(unittest.TestCase):
                 with contextlib.redirect_stdout(io.StringIO()) as out:
                     self.assertEqual(main([*args, "--json"]), 0)
                 self.assertEqual(json.loads(out.getvalue()), catalog)
-                discover.assert_called_once_with(root, codex_home=root, system_proxy=True)
+                discover.assert_called_once_with(root.resolve(), codex_home=root, system_proxy=True)
                 with contextlib.redirect_stdout(io.StringIO()) as out:
                     self.assertEqual(main(args), 0)
                 self.assertIn("fast-model", out.getvalue())
