@@ -30,11 +30,12 @@ class CliTests(unittest.TestCase):
 
     def test_end_to_end_all_five_commands(self):
         project = ["--project", str(self.root)]
-        preview = self.run_cli("init", *project, "--dry-run")
+        models = ["--main-model", "gpt-6.1-sol", "--worker-model", "gpt-6-luna", "--advisor-model", "gpt-6-astra"]
+        preview = self.run_cli("init", *project, *models, "--dry-run")
         self.assertEqual(preview.returncode, 0, preview.stderr)
         self.assertIn("+++ after/", preview.stdout)
         self.assertEqual(list(self.root.iterdir()), [])
-        installed = self.run_cli("init", *project)
+        installed = self.run_cli("init", *project, *models)
         self.assertEqual(installed.returncode, 0, installed.stderr)
         doctor = self.run_cli("doctor", *project, "--json")
         self.assertEqual(doctor.returncode, 0, doctor.stdout)

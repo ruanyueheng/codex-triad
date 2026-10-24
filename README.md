@@ -51,18 +51,19 @@ implement the fix, run the tests, and ask the advisor to review the diff.
 | Workers | Explore code, research dependencies and diagnose failures | `triad_explorer`, `triad_researcher`, `triad_triage` |
 | Advisor | Reviews designs, repeated failures and important changes | `triad_architect` |
 
-All three assignments are configurable. Sol/Luna/Astra are the original preset.
+Unspecified roles automatically use the latest visible stable Sol (coordinator), Luna (workers) and Astra (advisor). Re-running `init` refreshes automatic choices and preserves manual ones. All three assignments remain configurable.
 
 ## CLI
 
 Use the installed helper directly when you want to configure or inspect roles:
 
 ```bash
+python .agents/skills/codex-triad/scripts/triad.py models --project .
 python .agents/skills/codex-triad/scripts/triad.py init --project . --interactive
 python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 ```
 
-The five commands are `init`, `doctor`, `smoke`, `uninstall` and `report`. Add `--dry-run` to preview installation or removal. See the [guide](docs/GETTING_STARTED.md) for source installation, offline use and examples.
+The six commands are `models`, `init`, `doctor`, `smoke`, `uninstall` and `report`. `models --json` exports visible models and reasoning options; `init --interactive` lets you assign each role and effort. Add `--dry-run` to preview installation or removal. See the [guide](docs/GETTING_STARTED.md) for source installation, offline use and examples.
 
 ## Tests
 

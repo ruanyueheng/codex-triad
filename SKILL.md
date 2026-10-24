@@ -5,7 +5,9 @@ description: Set up or use a project-local Codex workflow with user-selected coo
 
 # Codex Triad
 
-Read the project's existing model assignment and preserve the user's choices. The three responsibilities are coordinator/implementation, worker/exploration, and advisor/review; no responsibility is permanently tied to a model family. Users may reuse one model across responsibilities. For setup, offer `init --interactive`: it queries the current client's visible model catalog and supported reasoning efforts. Catalog visibility is not proof of successful account access; never silently substitute another model after a failure. Sol/Luna/Astra are backward-compatible presets only.
+Read the project's existing model assignment and preserve manual choices. By default, `init` queries the current client's visible catalog and selects the latest stable Sol for coordinator/implementation, Luna for worker/exploration, and Astra for advisor/review. Re-running `init` refreshes automatic assignments; explicit model flags or interactive choices pin those roles. Historical manifests retain their saved assignments. Users may assign any model to any responsibility and reuse models. Offer `init --interactive` when they want to choose. Catalog visibility is not proof of account access or subagent compatibility; report a missing family or failed call without silently substituting models. For offline setup, specify all three model IDs explicitly.
+
+Use `models --project PATH` to inspect the current client's model IDs and supported/default reasoning efforts before setup; add `--json` for structured output. It queries the catalog without installing roles or starting generation turns. Interactive setup lets the user choose a model and supported effort separately for each responsibility, including model reuse.
 
 ## Choose the operation
 
@@ -21,9 +23,11 @@ When the user requires configuration isolation, run model tests through a child 
 
 Each child receives one goal, allowed paths, relevant evidence, constraints and expected output. Reports separate observed evidence from inference and unknowns. Explorer: EVIDENCE/ANSWER/UNRESOLVED. Researcher: FINDING/SOURCE/LIMITS/RECOMMENDATION. Triage: FAILURE_SIGNATURE/EVIDENCE/HYPOTHESES/NEXT_TEST/UNCERTAINTY. Keep worker reports near 300 words or less.
 
+For regressions, record the original failing tests before edits and preserve supplied acceptance tests unless the user asks to revise them. Complete worker baseline investigations before source edits, or give workers an immutable snapshot; label later findings as observations of modified code. For parsing or serialization changes, check an end-to-end or round-trip case across the changed boundary. Use byte comparisons when encoding or embedded newline preservation matters.
+
 Only the coordinator edits unless the user explicitly assigns other writers. Worker/advisor read-only instructions are behavioral constraints; their actual sandbox and permissions follow the parent.
 
-Request the configured advisor before consequential architecture/security/migration decisions, after two fixes with the same failure signature without progress, or before a nontrivial commit. Supply actual related code, diff, constraints and observed tests. Ask for VERDICT, BLOCKERS, RISKS, NEXT_ACTIONS and UNCERTAINTIES, at most about 450 words. These checkpoints are advisory; do not call them enforced hooks.
+Request the configured advisor before consequential architecture/security/migration decisions, after two fixes with the same failure signature without progress, or before delivering or committing a nontrivial repair. Supply actual related code, diff, constraints and observed tests. Resolve concrete blockers and rerun affected checks before delivery; avoid repeated review of unchanged evidence. Ask for VERDICT, BLOCKERS, RISKS, NEXT_ACTIONS and UNCERTAINTIES, at most about 450 words. These checkpoints are advisory; do not call them enforced hooks.
 
 ## Finish with evidence
 

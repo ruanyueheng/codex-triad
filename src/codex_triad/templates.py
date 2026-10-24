@@ -102,6 +102,10 @@ These are *configured intentions*, not proof of actual model selection.
 **Main session responsibility:** clarify acceptance criteria; own plans, source edits, focused tests,
 final integration and user communications. Keep decisions and evidence in the main thread.
 Spawn only independent, narrow research tasks; wait for reports, not full raw transcripts.
+For regressions, record failing tests before edits and preserve supplied acceptance tests unless
+the user asks to revise them. Finish worker baseline investigations before edits or supply an
+immutable snapshot; label findings from modified code accordingly. For parsing/serialization
+changes, check the changed I/O boundary end to end, using bytes when text fidelity matters.
 Prefer zero subagents for trivial work. Never invent a completed delegation or a model identity.
 
 **Delegation contract:** give each worker a goal, exact scope, relevant paths and expected output.
@@ -111,10 +115,10 @@ Avoid concurrent writes. The coordinator alone edits unless the user specificall
 **Advisor checkpoints (instruction-based, not an enforced hook):**
 1. Before a consequential/irreversible architecture, API, security or data-migration decision.
 2. After **two attempts with the same failure signature** without a meaningful change in diagnosis.
-3. Before committing a **nontrivial** change, review the actual diff, risks and observed tests.
+3. Before delivering or committing a **nontrivial repair**, review the actual diff, risks and observed tests.
 Skip the advisor for low-risk chores and do not repeatedly call it on unchanged evidence.
 The architect returns APPROVE / APPROVE_WITH_CONDITIONS / BLOCK / INSUFFICIENT_EVIDENCE;
-the main session owns the decision and must not conceal blockers.
+the main session owns the decision, resolves concrete blockers and reruns affected checks.
 
 **Evidence and permissions:** never claim a test passed without a recorded result. Do not
 commit, push, deploy, remove user data or relax sandbox settings without user authorization.

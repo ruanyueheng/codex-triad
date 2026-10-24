@@ -1,7 +1,11 @@
 # Changelog
 
-## Unreleased — 2026-10-24
+## 0.2.0a5 — 2026-10-24 · Automatic selection and model discovery
 
+- Add `models` to inspect current client-visible models and supported/default reasoning efforts independently of installation, with text and JSON output. Retain interactive role/effort selection and model reuse.
+- Resolve unspecified roles from the client's latest visible stable Sol/Luna/Astra models. Track automatic assignments for refresh on init, preserve explicit/interactive and legacy choices, reject absent families without writes, and keep fully explicit offline setup.
+- Adapt automatic efforts to model capabilities, allow interactive correction of unsupported pinned efforts, reject stale selection state inside the installation lock, and preview selection-provenance changes.
+- Preserve regression baselines and supplied acceptance tests, finish baseline investigations before edits, and check changed parsing/serialization boundaries end to end. Request advisor review before delivering a nontrivial repair even without a commit.
 - Protect default, environment-selected and explicitly supplied Codex homes before installation writes; apply the same shared guard to uninstall/recovery and previews while allowing managed worktrees.
 - Preserve installed model, effort and concurrency choices during non-interactive partial updates and repeated init.
 - Build wheel/source/skill artifacts from the explicit public-file list in MANIFEST.in; exclude unlisted local code, notes and evaluation data regardless of Git ignore rules.

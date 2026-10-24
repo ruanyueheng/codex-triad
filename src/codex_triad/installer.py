@@ -192,6 +192,10 @@ def _read_state(project: Path) -> dict[str, Any] | None:
     if not isinstance(data, dict) or type(data.get("schema_version")) is not int or data.get("schema_version") != 1 or data.get("generator") != "codex-triad":
         raise InstallationError("Unsupported triad-state.json format; manual upgrade required")
     _previous_settings(data)
+    _validate_auto_model_roles(data.get("auto_model_roles", []))
+    _validate_auto_model_roles(data.get("auto_effort_roles", []))
+    if not set(data.get("auto_effort_roles", [])) <= set(data.get("auto_model_roles", [])):
+        raise InstallationError("Automatic efforts require automatic model roles")
     hashes = data.get("agent_hashes")
     if not isinstance(hashes, dict) or not set(hashes) <= {f"{n}.toml" for n in AGENT_NAMES}:
         raise InstallationError("Invalid agent hashes in installation manifest")
@@ -221,14 +225,31 @@ def _validate_settings(settings: Settings) -> None:
             raise InstallationError(f"Invalid model ID for {attribute}")
 
 
-def install(project: Path, settings: Settings, *, dry_run: bool = False, force: bool = False) -> list[str]:
+def _validate_auto_model_roles(roles) -> None:
+    if not isinstance(roles, (list, tuple)) or any(role not in ("main", "worker", "advisor") for role in roles) or len(set(roles)) != len(roles):
+        raise InstallationError("Invalid automatic role metadata in installation manifest")
+
+
+_STATE_UNCHECKED = object()
+
+
+def install(project: Path, settings: Settings, *, dry_run: bool = False, force: bool = False,
+            auto_model_roles: tuple[str, ...] = (), auto_effort_roles: tuple[str, ...] = (),
+            expected_state: Any = _STATE_UNCHECKED) -> list[str]:
+    """Apply a complete assignment; explicit Settings pin roles unless provenance is supplied."""
     project = project.resolve()
     _validate_settings(settings)
+    _validate_auto_model_roles(auto_model_roles)
+    _validate_auto_model_roles(auto_effort_roles)
+    if not set(auto_effort_roles) <= set(auto_model_roles):
+        raise InstallationError("Automatic efforts require automatic model roles")
     with nullcontext() if dry_run else project_lock(project):
-        return _install(project, settings, dry_run=dry_run, force=force)
+        return _install(project, settings, dry_run=dry_run, force=force, auto_model_roles=auto_model_roles,
+                        auto_effort_roles=auto_effort_roles, expected_state=expected_state)
 
 
-def _install(project: Path, settings: Settings, *, dry_run: bool, force: bool) -> list[str]:
+def _install(project: Path, settings: Settings, *, dry_run: bool, force: bool, auto_model_roles: tuple[str, ...],
+             auto_effort_roles: tuple[str, ...], expected_state: Any) -> list[str]:
     project = project.resolve()
     if not project.is_dir():
         raise InstallationError(f"Project directory not found: {project}")
@@ -239,6 +260,8 @@ def _install(project: Path, settings: Settings, *, dry_run: bool, force: bool) -
     _assert_safe_paths(project, [config, agents_md, _state_path(project), *agent_paths])
     before = {p: read_bytes(p) for p in [config, agents_md, _state_path(project), *agent_paths]}
     state = _read_state(project)
+    if expected_state is not _STATE_UNCHECKED and state != expected_state:
+        raise InstallationError("Project model assignment changed during selection; rerun init. Installation was not applied.")
     previous = _previous_settings(state)
     existing_config = read_text(config)
     existing_agents = read_text(agents_md)
@@ -266,18 +289,7 @@ def _install(project: Path, settings: Settings, *, dry_run: bool, force: bool) -
         desired_agents[path] = rendered
 
     changes: dict[Path, str] = {config: updated_config, agents_md: updated_agents_md, **desired_agents}
-    messages = [f"{'WOULD INSTALL' if dry_run else 'INSTALL'} {path.relative_to(project)}" for path, new in changes.items()
-                if not path.exists() or read_text(path) != new]
-    messages.extend(f"WARNING {warning}" for warning in warnings)
-    if dry_run:
-        for path, new in changes.items():
-            old = read_text(path)
-            messages.extend(line.rstrip("\n") for line in difflib.unified_diff(
-                old.splitlines(keepends=True), new.splitlines(keepends=True),
-                fromfile=f"before/{path.relative_to(project).as_posix()}",
-                tofile=f"after/{path.relative_to(project).as_posix()}", n=0))
-        return messages or ["No changes needed"]
-    # No credentials or copies of the user config are persisted in the state file.
+    # Include selection provenance in the transaction and its dry-run preview.
     manifest = {
         "schema_version": 1,
         "generator": "codex-triad",
@@ -289,7 +301,22 @@ def _install(project: Path, settings: Settings, *, dry_run: bool, force: bool) -
         "policy_created": state.get("policy_created", False) if state else not agents_md.exists(),
         "policy_joiner": state.get("policy_joiner", "") if state and BEGIN in existing_agents else ("\n\n" if existing_agents else ""),
     }
+    if auto_model_roles:
+        manifest["auto_model_roles"] = list(auto_model_roles)
+    if auto_effort_roles:
+        manifest["auto_effort_roles"] = list(auto_effort_roles)
     changes[_state_path(project)] = json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
+    messages = [f"{'WOULD INSTALL' if dry_run else 'INSTALL'} {path.relative_to(project)}" for path, new in changes.items()
+                if not path.exists() or read_text(path) != new]
+    messages.extend(f"WARNING {warning}" for warning in warnings)
+    if dry_run:
+        for path, new in changes.items():
+            old = read_text(path)
+            messages.extend(line.rstrip("\n") for line in difflib.unified_diff(
+                old.splitlines(keepends=True), new.splitlines(keepends=True),
+                fromfile=f"before/{path.relative_to(project).as_posix()}",
+                tofile=f"after/{path.relative_to(project).as_posix()}", n=3 if path == _state_path(project) else 0))
+        return messages or ["No changes needed"]
     apply_changes(project, {p: text.encode("utf-8") for p, text in changes.items()}, before)
     return messages or ["Already up-to-date"]
 

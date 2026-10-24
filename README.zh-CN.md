@@ -51,18 +51,19 @@ $codex-triad
 | 工作者 | 代码探索、依赖研究与故障诊断 | `triad_explorer`、`triad_researcher`、`triad_triage` |
 | 顾问 | 设计评审、重复失败诊断与重要改动审查 | `triad_architect` |
 
-三种职责均可自由分配模型。Sol/Luna/Astra 是最初的预设组合。
+未指定时，自动选择客户端可见的最新稳定 Sol（主协调）、Luna（工作者）和 Astra（顾问）；重新运行 `init` 更新自动选择，保留手动指定的模型。三种职责仍可自由分配模型。
 
 ## CLI
 
 需要手动配置或检查时，可以直接使用安装后的工具：
 
 ```bash
+python .agents/skills/codex-triad/scripts/triad.py models --project .
 python .agents/skills/codex-triad/scripts/triad.py init --project . --interactive
 python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 ```
 
-提供 `init`、`doctor`、`smoke`、`uninstall`、`report` 五个命令。安装和卸载加 `--dry-run` 可先预览。源码安装、离线演练和更多示例见[完整指南](docs/GETTING_STARTED.md)。
+提供 `models`、`init`、`doctor`、`smoke`、`uninstall`、`report` 六个命令。`models --json` 可导出模型和支持的推理强度；`init --interactive` 自选三种职责及强度。安装和卸载加 `--dry-run` 可先预览。源码安装、离线演练和更多示例见[完整指南](docs/GETTING_STARTED.md)。
 
 ## 测试
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codex-triad"
-version = "0.2.0a4"
+version = "0.2.0a5"
 description = "Safe project-local three-tier Codex subagent configuration and diagnostics"
 readme = "README.md"
 requires-python = ">=3.11"

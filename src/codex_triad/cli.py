@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import replace
 import json
 import sys
 from pathlib import Path
@@ -12,8 +13,8 @@ from .installer import InstallationError, install, uninstall
 from .templates import EFFORTS, Settings
 from .storage import recover
 from .evidence import EvidenceError, verify_runtime
-from .models import ModelSelectionError, choose_settings, discover_models
-from .installer import _previous_settings, _read_state
+from .models import ModelSelectionError, ROLE_FAMILIES, choose_settings, discover_models, latest_model
+from .installer import _previous_settings, _read_state, _validate_settings
 from .storage import assert_safe_paths
 
 SMOKE = {
@@ -55,6 +56,11 @@ def make_parser() -> argparse.ArgumentParser:
     init.add_argument("--dry-run", action="store_true")
     init.add_argument("--recover", action="store_true", help="Restore an interrupted transaction only; do not install")
     init.add_argument("--force", action="store_true", help="Replace locally edited Triad agent files or marked policy (never unrelated config)")
+    models = subs.add_parser("models", help="List client-visible models and supported reasoning efforts; no generation calls")
+    models.add_argument("--project", type=Path, default=Path.cwd())
+    models.add_argument("--codex-home", type=Path, help="Optional configured Codex home, child process only")
+    models.add_argument("--system-proxy", action="store_true", help="Inherit system proxy in the discovery child only")
+    models.add_argument("--json", action="store_true", help="Print the visible model catalog as JSON")
     doctor = subs.add_parser("doctor", help="Static checks (never claims live model availability)")
     doctor.add_argument("--project", type=Path, default=Path.cwd())
     doctor.add_argument("--json", action="store_true", help="Print machine-readable report")
@@ -77,6 +83,18 @@ def make_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = make_parser().parse_args(argv)
     try:
+        if args.command == "models":
+            project = args.project.resolve()
+            if not project.is_dir():
+                raise ModelSelectionError("Project directory not found")
+            catalog = discover_models(project, codex_home=args.codex_home, system_proxy=args.system_proxy)
+            if args.json:
+                print(json.dumps(catalog, ensure_ascii=False, indent=2))
+            else:
+                for model in catalog:
+                    print(f"{model['model']}{' [client default]' if model['is_default'] else ''} | efforts: {', '.join(model['efforts'])} | default: {model['default_effort']}")
+                print("Client-visible catalog only; actual generation/subagent access has not been tested. No generation calls were made.")
+            return 0
         if args.command in ("init", "uninstall") and args.recover:
             if args.dry_run:
                 raise InstallationError("--recover cannot be combined with --dry-run")
@@ -90,14 +108,39 @@ def main(argv: list[str] | None = None) -> int:
             if not project.is_dir():
                 raise InstallationError("Project directory not found")
             assert_safe_paths(project, [project / ".codex/triad-state.json"], codex_home=args.codex_home)
-            defaults = _previous_settings(_read_state(project)) or Settings()
+            state = _read_state(project)
+            defaults = _previous_settings(state) or Settings()
             settings = Settings(**{key: getattr(args, key) if getattr(args, key) is not None else getattr(defaults, key) for key in
                 ("main_model", "advisor_model", "worker_model", "main_effort", "advisor_effort", "worker_effort")},
                 max_subagents=args.max_subagents if args.max_subagents is not None else defaults.max_subagents)
-            if args.interactive:
+            _validate_settings(settings)
+            auto_roles = tuple(role for role in ROLE_FAMILIES if getattr(args, role + "_model") is None
+                               and (state is None or role in state.get("auto_model_roles", [])))
+            auto_efforts = tuple(role for role in auto_roles if getattr(args, role + "_effort") is None
+                                 and (state is None or role in state.get("auto_effort_roles", [])))
+            if args.interactive or auto_roles:
                 catalog = discover_models(project, codex_home=args.codex_home, system_proxy=args.system_proxy)
-                settings = choose_settings(catalog, settings, ask=input, show=print)
-            for item in install(args.project, settings, dry_run=args.dry_run, force=args.force):
+                for role in auto_roles:
+                    selected = latest_model(catalog, ROLE_FAMILIES[role])
+                    if selected is None:
+                        if args.interactive:
+                            continue
+                        raise ModelSelectionError(f"No visible stable {ROLE_FAMILIES[role]} model; specify --{role}-model or use --interactive. Nothing was installed.")
+                    effort = getattr(settings, role + "_effort")
+                    if effort not in selected["efforts"]:
+                        if not args.interactive and role not in auto_efforts:
+                            raise ModelSelectionError(f"{selected['model']} does not support --{role}-effort {effort}")
+                        effort = selected["default_effort"]
+                    settings = replace(settings, **{role + "_model": selected["model"], role + "_effort": effort})
+                if args.interactive:
+                    settings = choose_settings(catalog, settings, ask=input, show=print)
+                    auto_roles = ()
+                    auto_efforts = ()
+                else:
+                    for role in auto_roles:
+                        print(f"AUTO {role}: {getattr(settings, role + '_model')}/{getattr(settings, role + '_effort')} (latest visible stable {ROLE_FAMILIES[role]})")
+            for item in install(args.project, settings, dry_run=args.dry_run, force=args.force, auto_model_roles=auto_roles,
+                                auto_effort_roles=auto_efforts, expected_state=state):
                 print(item)
             if not args.dry_run:
                 print("Next: trust/open the project in local Codex; run `codex-triad doctor`, then `codex-triad smoke`. No runtime model calls have been made.")

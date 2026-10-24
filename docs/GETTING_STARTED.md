@@ -18,8 +18,8 @@ This route needs no Codex login or model access. It uses the legacy presets to d
 
 ```bash
 mkdir ../triad-offline-demo
-python scripts/triad.py init --project ../triad-offline-demo --dry-run
-python scripts/triad.py init --project ../triad-offline-demo
+python scripts/triad.py init --project ../triad-offline-demo --main-model gpt-6.1-sol --worker-model gpt-6-luna --advisor-model gpt-6-astra --dry-run
+python scripts/triad.py init --project ../triad-offline-demo --main-model gpt-6.1-sol --worker-model gpt-6-luna --advisor-model gpt-6-astra
 python scripts/triad.py doctor --project ../triad-offline-demo --json
 python scripts/triad.py smoke --phase workers
 python scripts/triad.py report --runtime-evidence evaluation/cli-runtime-20261023.json --json
@@ -36,6 +36,8 @@ Expected: preview prints proposed changes, install creates the role/config files
 For an actual project, use a fresh target directory or inspect existing settings first:
 
 ```bash
+python scripts/triad.py models --project ../my-app
+python scripts/triad.py models --project ../my-app --json
 python scripts/triad.py init --project ../my-app --interactive --dry-run
 python scripts/triad.py init --project ../my-app --interactive
 python scripts/triad.py doctor --project ../my-app --json
@@ -45,7 +47,9 @@ Choose a catalog number or full ID and a supported reasoning effort for each res
 
 For automation use `--main-model`, `--worker-model`, `--advisor-model` and the corresponding `--*-effort` flags with IDs/options valid for your client. Existing user configuration remains protected. See [model assignment](MODEL_ASSIGNMENT.md).
 
-When updating an existing installation, omitted flags keep its saved models, reasoning efforts and concurrency. For example, `init --project ../my-app --max-subagents 2` changes only concurrency. Fresh installations still use the legacy presets unless you select models.
+Without model flags, a fresh installation selects the latest visible stable Sol/Luna/Astra for coordinator/workers/advisor. Re-running `init` refreshes roles recorded as automatic. Explicit model flags and interactive choices pin their roles; historical manifests also keep their saved choices. Compatible saved efforts and concurrency stay unchanged. Automatic efforts can adapt to a new model's capabilities; unsupported pinned efforts require explicit correction or `--interactive`. See [selection rules](MODEL_ASSIGNMENT.md).
+
+Default discovery and `--interactive` query the local client without starting generation turns. A missing family stops automatic installation; select a model explicitly or use the interactive picker. Specifying all three models skips discovery and supports offline setup.
 
 The default and configured Codex homes are protected targets, including when a project would use one as its `.codex` directory. Install, uninstall and recovery refuse these targets before creating a lock. Choose a normal project directory; managed worktrees inside a Codex home remain supported.
 
@@ -83,11 +87,11 @@ Build it locally with existing setuptools/wheel, or download the preview artifac
 python tools/build_release.py
 ```
 
-PowerShell example after building 0.2.0a4; choose your actual target path:
+PowerShell example after building 0.2.0a5; choose your actual target path:
 
 ```powershell
 New-Item -ItemType Directory -Force 'C:\Projects\MyApp\.agents\skills'
-Expand-Archive -LiteralPath '.\dist\codex-triad-0.2.0a4-skill.zip' -DestinationPath 'C:\Projects\MyApp\.agents\skills'
+Expand-Archive -LiteralPath '.\dist\codex-triad-0.2.0a5-skill.zip' -DestinationPath 'C:\Projects\MyApp\.agents\skills'
 ```
 
 The destination `codex-triad` folder must not already exist; compare an existing skill before upgrading. On macOS/Linux, extract the same ZIP into the target's `.agents/skills/` with your archive tool. Preserve `SKILL.md`, `LICENSE`, `scripts/`, `src/`, `docs/` and `evaluation/` together. No global pip or Codex configuration change is required.

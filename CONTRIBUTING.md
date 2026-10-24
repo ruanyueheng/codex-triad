@@ -25,7 +25,7 @@ Builds need setuptools>=68 and wheel; normal pip may fetch tooling. CI runs thes
 6. Explain whether behavior is a deterministic capability, an AGENTS.md instruction, or a user-observed result.
 7. Add new public source, tests, fixtures and docs to the explicit `MANIFEST.in` file list; release builds exclude unlisted files. Do not add wildcard includes or private evaluation data.
 
-Describe the concrete failure, resulting behavior and observed tests. Preserve the five CLI commands and existing manifests, or explain migration. See [evaluation guidelines](docs/EVALUATION.md) for performance claims.
+Describe the concrete failure, resulting behavior and observed tests. Preserve existing CLI commands and manifests, or explain migration. See [evaluation guidelines](docs/EVALUATION.md) for performance claims.
 
 ## Privacy and isolated tests
 
@@ -38,4 +38,4 @@ For isolated runtime tests use a separate CODEX_HOME and child CLI/App Server. D
 Keep [English](README.md) and [Chinese](README.zh-CN.md) behavior aligned. README is the first-use path; detailed setup and current verification belong in docs/GETTING_STARTED.md and docs/VALIDATION.md. Keep historical reports as history.
 
 
-中文开发检查：保持五个 CLI 命令与旧参数兼容；安全边界变更需回归测试。`python -m compileall -q src tests tools` 做轻量语法检查；运行 `python tools/build_release.py` 和 `python tools/check_wheel.py` 验证离线包。未引入 lint/type-check 依赖；语法检查不等于类型检查。恢复日志、私有配置、真实试验数据不要提交。
+中文开发检查：保持已有 CLI 命令与旧参数兼容；安全边界变更需回归测试。`python -m compileall -q src tests tools` 做轻量语法检查；运行 `python tools/build_release.py` 和 `python tools/check_wheel.py` 验证离线包。未引入 lint/type-check 依赖；语法检查不等于类型检查。恢复日志、私有配置、真实试验数据不要提交。

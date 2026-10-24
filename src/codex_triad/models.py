@@ -2,6 +2,7 @@
 from dataclasses import replace
 import os
 from pathlib import Path
+import re
 import shutil
 import tempfile
 import urllib.request
@@ -12,6 +13,23 @@ from .templates import EFFORTS, Settings
 
 class ModelSelectionError(ValueError):
     pass
+
+
+ROLE_FAMILIES = {"main": "sol", "advisor": "astra", "worker": "luna"}
+
+
+def latest_model(catalog: list[dict], family: str) -> dict | None:
+    """Rank stable family IDs by numeric version, then rolling alias or snapshot."""
+    candidates = []
+    pattern = r"(?:[^/]+/)*gpt-([0-9]+(?:\.[0-9]+)*)-" + re.escape(family) + r"(?:-(latest|[0-9]{4}-[0-9]{2}-[0-9]{2}))?"
+    for model in catalog:
+        match = re.fullmatch(pattern, model["model"])
+        if match:
+            version = tuple(int(part) for part in match[1].split("."))
+            suffix = match[2]
+            alias = 2 if suffix == "latest" else 1 if suffix is None else 0
+            candidates.append(((version, alias, suffix or "", model["is_default"], model["model"]), model))
+    return max(candidates, key=lambda item: item[0])[1] if candidates else None
 
 
 def visible_models(entries: list) -> list[dict]:

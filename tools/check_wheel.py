@@ -30,11 +30,13 @@ def main():
         assert run("-c", "import codex_triad; print(codex_triad.__version__)").stdout.strip() == version
         project = folder / "project"
         project.mkdir()
+        models = ("--main-model", "gpt-6.1-sol", "--worker-model", "gpt-6-luna", "--advisor-model", "gpt-6-astra")
         run("-m", "codex_triad", "--help")
+        run("-m", "codex_triad", "models", "--help")
         console = python.parent / ("codex-triad.exe" if os.name == "nt" else "codex-triad")
         subprocess.run([str(console), "--help"], cwd=folder, env=environment,
                        check=True, capture_output=True, timeout=15)
-        run("-m", "codex_triad", "init", "--project", str(project))
+        run("-m", "codex_triad", "init", "--project", str(project), *models)
         run("-m", "codex_triad", "doctor", "--project", str(project), "--json")
         run("-m", "codex_triad", "uninstall", "--project", str(project))
         assert not (project / "AGENTS.md").exists()
@@ -59,10 +61,11 @@ def main():
         config.write_bytes(original_config)
         rules.write_bytes(original_rules)
         skill("--help")
-        skill("init", "--project", str(target), "--dry-run")
+        skill("models", "--help")
+        skill("init", "--project", str(target), *models, "--dry-run")
         assert config.read_bytes() == original_config and rules.read_bytes() == original_rules
         assert not (target / ".codex" / "triad-state.json").exists()
-        skill("init", "--project", str(target))
+        skill("init", "--project", str(target), *models)
         skill("doctor", "--project", str(target), "--json")
         skill("smoke", "--phase", "workers")
         skill("smoke", "--phase", "advisor")
