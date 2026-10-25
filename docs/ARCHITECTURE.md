@@ -8,7 +8,8 @@ Triad 0.2.0a5 is a **generator/installer for native Codex custom agents**. It do
 
 ## Implementation boundaries / 实现边界
 
-- `cli.py`: five stable commands, exit codes and output. Explicit `--recover` performs recovery only.
+- `cli.py`: six stable commands (`init`, `models`, `doctor`, `smoke`, `uninstall`, `report`), exit codes and output. Explicit `--recover` performs recovery only.
+
 - `templates.py`: settings, official agent fields and bounded role instructions.
 - `installer.py`: ownership, configuration merge, change planning and uninstall reports.
 - `storage.py`: shared path guards, OS lock, snapshot comparison, atomic replacement, local journal and rollback/recovery.

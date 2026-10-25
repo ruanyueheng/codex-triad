@@ -68,3 +68,10 @@ class EvidenceTests(unittest.TestCase):
     def test_malformed_input_is_rejected(self):
         for b in ([], None, {"schema_version": 1}, {**self.bundle, "children": []}):
             with self.subTest(b=b), self.assertRaises(EvidenceError): self.verify(b)
+
+    def test_missing_or_non_utf8_file_is_rejected_as_evidence_error(self):
+        with self.assertRaises(EvidenceError):
+            verify_runtime(self.path)
+        self.path.write_bytes(b"\xff")
+        with self.assertRaises(EvidenceError):
+            verify_runtime(self.path)

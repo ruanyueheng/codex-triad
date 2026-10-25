@@ -78,5 +78,5 @@ def verify_runtime(path: Path, settings: Settings = Settings()) -> dict:
         return {"status": "PASS", "root_thread_id": root_id, "root_model": root["model"],
                 "roles": roles, "model_evidence": "CLIENT_RUNTIME", "backend_identity": "UNKNOWN",
                 "notice": "Validates supplied protocol records, not their authenticity or account-wide availability."}
-    except (ValueError, TypeError, KeyError, AttributeError) as exc:
+    except (OSError, UnicodeError, ValueError, TypeError, KeyError, AttributeError) as exc:
         raise EvidenceError(f"Runtime evidence rejected: {exc}") from exc

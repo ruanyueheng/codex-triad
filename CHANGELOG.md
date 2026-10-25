@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Normalize missing, unreadable and non-UTF-8 runtime evidence files to `EvidenceError` so the CLI keeps structured error handling.
+- Synchronize architecture and validation docs with the six-command CLI and current offline lifecycle checks.
+
 ## 0.2.0a5 — 2026-10-24 · Automatic selection and model discovery
 
 - Add `models` to inspect current client-visible models and supported/default reasoning efforts independently of installation, with text and JSON output. Retain interactive role/effort selection and model reuse.
