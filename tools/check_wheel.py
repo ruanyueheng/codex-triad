@@ -33,6 +33,7 @@ def main():
         models = ("--main-model", "gpt-6.1-sol", "--worker-model", "gpt-6-luna", "--advisor-model", "gpt-6-astra")
         run("-m", "codex_triad", "--help")
         run("-m", "codex_triad", "models", "--help")
+        assert "--check-models" in run("-m", "codex_triad", "doctor", "--help").stdout
         console = python.parent / ("codex-triad.exe" if os.name == "nt" else "codex-triad")
         subprocess.run([str(console), "--help"], cwd=folder, env=environment,
                        check=True, capture_output=True, timeout=15)
@@ -62,6 +63,7 @@ def main():
         rules.write_bytes(original_rules)
         skill("--help")
         skill("models", "--help")
+        assert "--check-models" in skill("doctor", "--help").stdout
         skill("init", "--project", str(target), *models, "--dry-run")
         assert config.read_bytes() == original_config and rules.read_bytes() == original_rules
         assert not (target / ".codex" / "triad-state.json").exists()

@@ -9,6 +9,8 @@ Read the project's existing model assignment and preserve manual choices. By def
 
 Use `models --project PATH` to inspect the current client's model IDs and supported/default reasoning efforts before setup; add `--json` for structured output. It queries the catalog without installing roles or starting generation turns. Interactive setup lets the user choose a model and supported effort separately for each responsibility, including model reuse.
 
+For an existing installation with suspected model/effort drift, use `doctor --project PATH --check-models --json`. Default doctor remains static. This opt-in compares actual configuration with the client catalog; missing entries are WARN and query failures UNKNOWN, never proof of access denial or permission to change models. Use the same `--codex-home` and proxy options as the intended client; fix static failures before querying. See [model diagnostics](docs/MODEL_ASSIGNMENT.md).
+
 ## Choose the operation
 
 - **Use the workflow:** inspect the task and acceptance criteria. Delegate independent bounded questions to the configured workers when useful, wait for evidence, let the configured coordinator own source changes and tests, and send the actual design/diff/test evidence to the configured advisor at relevant checkpoints. If no agent interface exists, report that limitation and perform an explicitly disclosed single-agent fallback.

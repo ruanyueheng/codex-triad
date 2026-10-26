@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from .installer import _assert_managed_intact, _hash, _read_state
+from .models import ModelSelectionError, discover_models
 from .storage import InstallationError, assert_safe_paths, ensure_no_pending, read_text
 from .templates import AGENT_NAMES, BEGIN, END, EFFORTS
 
@@ -22,7 +23,8 @@ class Check:
         return {"level": self.level, "code": self.code, "message": self.message}
 
 
-def diagnose(project: Path) -> list[Check]:
+def diagnose(project: Path, *, check_models: bool = False, codex_home: Path | None = None,
+             system_proxy: bool = False) -> list[Check]:
     project = project.resolve()
     result = [Check("PASS", "CONFIG_PATH", str(project / ".codex/config.toml"))]
     if not project.is_dir():
@@ -50,6 +52,7 @@ def diagnose(project: Path) -> list[Check]:
     result.append(Check("PASS" if state else "WARN", "MANIFEST" if state else "NO_MANIFEST",
                         "Managed installation recorded" if state else "No valid installation manifest"))
     expected = state["settings"] if state else {}
+    configured = [("main", parsed.get("model"), parsed.get("model_reasoning_effort"))]
     for key, wanted in (("model", expected.get("main_model")),
                         ("model_reasoning_effort", expected.get("main_effort"))):
         got = parsed.get(key)
@@ -82,6 +85,8 @@ def diagnose(project: Path) -> list[Check]:
             result.append(Check("WARN", "DEFAULT_MODEL", f"agents.{key} differs from the Triad target"))
     if "default_subagent_reasoning_effort" in agents and agents["default_subagent_reasoning_effort"] not in EFFORTS:
         result.append(Check("FAIL", "EFFORT_SCHEMA", "Unsupported default subagent effort"))
+    if agents.get("default_subagent_model"):
+        configured.append(("default worker", agents["default_subagent_model"], agents.get("default_subagent_reasoning_effort")))
     try:
         text = read_text(policy)
         if text.count(BEGIN) != 1 or text.count(END) != 1 or text.index(BEGIN) > text.index(END):
@@ -119,6 +124,29 @@ def diagnose(project: Path) -> list[Check]:
             result.append(Check("WARN", "ROLE_OVERRIDE", f"agents.{name} also declared; inspect manually"))
         if state and _hash(text) != state["agent_hashes"].get(path.name):
             result.append(Check("WARN", "MODIFIED_AGENT", f"{name}: file differs from installation manifest"))
+        configured.append((name, agent["model"], agent["model_reasoning_effort"]))
+    if check_models:
+        if any(check.level == "FAIL" for check in result):
+            result.append(Check("UNKNOWN", "MODEL_CATALOG", "Fix static failures before checking the client model catalog"))
+        else:
+            try:
+                catalog = {model["model"]: model for model in discover_models(
+                    project, codex_home=codex_home, system_proxy=system_proxy)}
+            except (ModelSelectionError, OSError, UnicodeError) as exc:
+                result.append(Check("UNKNOWN", "MODEL_CATALOG", f"Client catalog unavailable: {exc}"))
+            else:
+                for role, model, effort in configured:
+                    if model not in catalog:
+                        result.append(Check("WARN", "MODEL_NOT_LISTED",
+                                            f"{role}: {model!r} is absent from the visible client catalog; access remains unverified. "
+                                            "Review `models` or `init --interactive` using the same --project/--codex-home."))
+                    elif effort is not None and effort not in catalog[model]["efforts"]:
+                        result.append(Check("WARN", "MODEL_EFFORT_NOT_LISTED",
+                                            f"{role}: {model!r} does not list effort {effort!r}; reported options: "
+                                            f"{', '.join(catalog[model]['efforts'])}. Review the configured effort."))
+                    else:
+                        result.append(Check("PASS", "MODEL_LISTED",
+                                            f"{role}: {model!r}/{effort or 'client default'} matches the client catalog; generation access unverified"))
     executable = shutil.which("codex")
     if executable:
         try:

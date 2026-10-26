@@ -2,6 +2,15 @@
 
 Status markers: `[x]` implemented, `[ ]` proposed (not promised).
 
+## Immediate priorities — 2026-10-26
+
+1. [x] Diagnose installed model/effort drift with opt-in `doctor --check-models`; keep catalog matching distinct from generation access.
+2. [x] Surface transport failures promptly and close CLI launchers gracefully; cover EOF, malformed streams, inherited pipes and bounded shutdown.
+3. [ ] Expand the client compatibility fixtures to additional pinned releases and macOS, retaining actual failure records.
+4. [ ] Collect repeated paired task measurements, including failed and timed-out runs, before claiming collaboration quality, speed or cost gains.
+
+The next evidence gap is repeatable client compatibility and measured task outcomes. A new scheduler remains research until supported event contracts and concrete user needs justify its maintenance cost.
+
 ## v0.1 — Reproducible, safe foundation
 
 - [x] Generate official-format Codex custom agents.

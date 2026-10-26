@@ -63,6 +63,8 @@ python .agents/skills/codex-triad/scripts/triad.py init --project . --interactiv
 python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 ```
 
+已有配置遇到模型或推理强度问题时，加 `doctor --check-models` 对照当前客户端目录；只查询、不生成，目录不匹配显示警告。[诊断说明](docs/MODEL_ASSIGNMENT.md)
+
 提供 `models`、`init`、`doctor`、`smoke`、`uninstall`、`report` 六个命令。`models --json` 可导出模型和支持的推理强度；`init --interactive` 自选三种职责及强度。安装和卸载加 `--dry-run` 可先预览。源码安装、离线演练和更多示例见[完整指南](docs/GETTING_STARTED.md)。
 
 ## 测试

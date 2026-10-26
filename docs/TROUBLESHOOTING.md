@@ -16,6 +16,10 @@
 | 权限/杀毒占用 | 关闭占用目标文件的程序，确认项目目录可写；回滚失败时保护恢复记录 |
 | doctor exit 0 但不能启动 | 0 只代表无静态 FAIL；UNKNOWN 不表示运行成功。检查信任、客户端、账户与模型访问 |
 | 版本探测 UNKNOWN | CLI 可能不在 PATH，桌面仍可能可用；doctor 不由版本号推断功能支持 |
+| 模型或强度可能过期 | 运行 `doctor --project PATH --check-models --json`；`MODEL_NOT_LISTED` / `MODEL_EFFORT_NOT_LISTED` 为目录不匹配警告，按提示用同一客户端环境核对，工具不会自动改选模型 |
+| `MODEL_CATALOG: UNKNOWN` | 目录查询失败或静态检查阻止查询；先处理已有 FAIL，再核对 CLI 和 `--codex-home`。UNKNOWN 不代表模型可用或不可用 |
+| `Invalid App Server stream` / `App Server closed` | 客户端输出非 JSON、UTF-8 解码失败、管道读取失败或进程提前退出；共享传输层立即报告失败。核对客户端启动/配置与私有 stderr；不要将包含私有内容的原始日志直接上传 |
+| 查询结束后隔离目录仍被占用 | 工具先关闭 stdin 并等待客户端退出，超时再终止；Windows 会清理该启动进程的子进程树。仍有占用时检查私有错误和实际进程，不要终止其他 Codex 会话 |
 | `--interactive` 的 App Server 启动失败 | 查看原始错误；桌面全局配置可能包含当前 CLI 不支持的字段或 MCP transport。使用单独配置并通过正常客户端登录的 Codex home，再传 `--codex-home PATH`，不要改全局配置来掩盖兼容性错误 |
 | skill 未出现在选择器中 | 检查目标仓库 `.agents/skills/codex-triad/SKILL.md` 与配套目录；单纯克隆源码不等于注册。按需重启 Codex，或先显式引用 SKILL.md 的绝对路径 |
 | smoke 后没有子线程 | smoke 只打印提示词；在已授权、已信任的目标会话中执行才会启动真实调用 |

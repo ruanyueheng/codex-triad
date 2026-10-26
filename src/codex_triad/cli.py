@@ -61,9 +61,12 @@ def make_parser() -> argparse.ArgumentParser:
     models.add_argument("--codex-home", type=Path, help="Optional configured Codex home, child process only")
     models.add_argument("--system-proxy", action="store_true", help="Inherit system proxy in the discovery child only")
     models.add_argument("--json", action="store_true", help="Print the visible model catalog as JSON")
-    doctor = subs.add_parser("doctor", help="Static checks (never claims live model availability)")
+    doctor = subs.add_parser("doctor", help="Static checks and optional client model catalog comparison")
     doctor.add_argument("--project", type=Path, default=Path.cwd())
     doctor.add_argument("--json", action="store_true", help="Print machine-readable report")
+    doctor.add_argument("--check-models", action="store_true", help="Compare configured models/efforts with the client catalog; no generation calls")
+    doctor.add_argument("--codex-home", type=Path, help="Configured Codex home for --check-models, child process only")
+    doctor.add_argument("--system-proxy", action="store_true", help="Inherit system proxy for --check-models in the child only")
     smoke = subs.add_parser("smoke", help="Print a real subagent test prompt for use in Codex")
     smoke.add_argument("--phase", choices=tuple(SMOKE), default="workers")
     remove = subs.add_parser("uninstall", help="Remove managed Triad additions; keep unrelated files")
@@ -146,7 +149,10 @@ def main(argv: list[str] | None = None) -> int:
                 print("Next: trust/open the project in local Codex; run `codex-triad doctor`, then `codex-triad smoke`. No runtime model calls have been made.")
             return 0
         if args.command == "doctor":
-            results = diagnose(args.project)
+            if not args.check_models and (args.codex_home is not None or args.system_proxy):
+                raise ModelSelectionError("doctor --codex-home/--system-proxy require --check-models")
+            results = diagnose(args.project, check_models=args.check_models,
+                               codex_home=args.codex_home, system_proxy=args.system_proxy)
             if args.json:
                 print(json.dumps([r.to_dict() for r in results], ensure_ascii=False, indent=2))
             else:

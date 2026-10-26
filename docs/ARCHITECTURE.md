@@ -13,7 +13,7 @@ Triad 0.2.0a5 is a **generator/installer for native Codex custom agents**. It do
 - `templates.py`: settings, official agent fields and bounded role instructions.
 - `installer.py`: ownership, configuration merge, change planning and uninstall reports.
 - `storage.py`: shared path guards, OS lock, snapshot comparison, atomic replacement, local journal and rollback/recovery.
-- `checker.py`: static diagnostics using the same ownership/path checks; runtime facts remain UNKNOWN.
+- `checker.py`: static diagnostics using the same ownership/path checks, with opt-in client model/effort catalog comparison; runtime facts remain UNKNOWN.
 - `models.py`: explicit model catalog queries and role/effort selection; no generation turns.
 - `appserver.py`: shared installed-client JSON-RPC transport.
 - `evidence.py`: offline role/thread/lifecycle verification for supplied records.

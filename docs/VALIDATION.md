@@ -2,6 +2,15 @@
 
 This is an alpha preview. A passing static check, a successful model call, native role metadata and a provider-side identity proof are different kinds of evidence.
 
+## Model diagnostics and transport lifecycle — 2026-10-26
+
+- Windows / Python 3.11.15 and 3.14: all 122 unit/integration tests passed on each interpreter. New coverage includes opt-in catalog checks, preserved user settings and edited role files, missing models/efforts, unavailable catalogs, no-write/default-static behavior, malformed JSON/UTF-8, pipe errors, persistent disconnects, and graceful/forced shutdown.
+- A real launcher/child subprocess test confirms stdin EOF allows the child to finish before the launcher exits. Windows tree termination and POSIX terminate/kill escalation are separately exercised with mocks; this is not a native Linux/macOS result.
+- CLI 0.164.0 in a fresh, unauthenticated child Codex home returned a model catalog. Doctor matched six configured entries in one run; another run deliberately used an absent worker model and returned four WARN entries plus matching main/advisor entries. Runtime access remained UNKNOWN, with project bytes and global configuration hashes unchanged. No Codex generation turns were started.
+- Initial live probes exposed extension-startup Git processes remaining after the main App Server exited. With hooks/apps/plugins disabled at process startup, a fresh probe started only the cmd/node/codex launcher tree and all observed members exited after close. The before/after process inspection, rather than the main process exit alone, establishes this bounded result.
+- The wheel and standalone skill passed isolated install/doctor/report/uninstall checks, including discovery of the new flag in both distributions. Source compilation, changed-document local links and diff whitespace checks passed. Build tools were installed only into an ignored local build environment; project runtime dependencies remain standard-library-only.
+- These are local pre-push results; the Windows/Linux CI matrix must be checked against the exact GitHub commit. No new paid three-role workflow or native Linux/macOS integration was run locally. Temporary live-observation directories were retained after an automatic approval policy rejected cleanup of an earlier test directory; private diagnostics are outside the repository and release manifest.
+
 ## Review hardening — 2026-10-24
 
 ### Skill continuation and automatic model selection — 2026-10-24

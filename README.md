@@ -63,6 +63,8 @@ python .agents/skills/codex-triad/scripts/triad.py init --project . --interactiv
 python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 ```
 
+For suspected model or reasoning-effort drift, add `doctor --check-models` to compare configuration with the current client catalog without generation calls. Missing entries produce warnings. See [model diagnostics](docs/MODEL_ASSIGNMENT.md).
+
 The six commands are `models`, `init`, `doctor`, `smoke`, `uninstall` and `report`. `models --json` exports visible models and reasoning options; `init --interactive` lets you assign each role and effort. Add `--dry-run` to preview installation or removal. See the [guide](docs/GETTING_STARTED.md) for source installation, offline use and examples.
 
 ## Tests

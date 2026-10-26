@@ -13,6 +13,19 @@ python scripts/triad.py init --project PATH --interactive
 
 `models` 不写项目角色或启动生成 turn；输出来自客户端目录，不表示已验证实际调用权限。交互流程为每种职责分别选择模型及其报告支持的推理强度，可让同一模型承担多种职责。失败或取消不写入。`--codex-home` 和 `--system-proxy` 同样适用于独立查询。
 
+已有项目可按需检查当前配置与客户端目录是否匹配：
+
+```powershell
+python scripts/triad.py doctor --project PATH --check-models --json
+python scripts/triad.py doctor --project PATH --check-models --codex-home ISOLATED_HOME
+```
+
+默认 `doctor` 保持静态；`--check-models` 启动客户端 App Server，只查询模型目录，不启动线程或生成 turn，不修改项目配置。检查主模型、默认工作者和四个角色文件中的实际模型/强度，包括保留的用户配置及角色文件的本地编辑；存在静态 FAIL 时先修复，不查询目录。客户端可能维护自己的状态，需要隔离时指定单独的 `--codex-home`。
+
+探测子进程从启动时禁用 hooks、apps 和 plugins，减少与目录查询无关的扩展初始化和 Git 同步；覆盖只作用于该子进程，不更改全局设置。查询结束先关闭 stdin 等待退出，超时再有界终止。
+
+`MODEL_NOT_LISTED` 与 `MODEL_EFFORT_NOT_LISTED` 是 WARN，分别指出未列出的模型和强度；可运行 `models` 或 `init --interactive --dry-run` 核对，保持相同的 `--project`、`--codex-home` 和代理选项。查询失败为 `MODEL_CATALOG: UNKNOWN`，匹配为 `MODEL_LISTED: PASS`，均不证明或否定实际调用权限。退出码仍为静态 FAIL 时 1，其余 0；自动化需要检查 JSON 中的具体 level/code。`--codex-home` / `--system-proxy` 在 doctor 中必须与 `--check-models` 同用。
+
 不指定模型时，首次 `init` 自动查询客户端 `model/list`，默认主协调选择最新稳定 Sol，工作者选择最新稳定 Luna，顾问选择最新稳定 Astra。只匹配客户端实际返回的 `gpt-版本-系列` ID（允许 provider 前缀），按数字版本比较，例如 6.10 高于 6.9；同版本优先 `-latest`，其次无日期滚动 ID，最后选择最新日期快照。默认不选择 preview、mini、pro 等不同变体；无法识别的命名需手动指定。这里的“最新”是客户端当前可见的稳定候选，不是全网发布或账户权限认证。
 
 自动选择的职责记录在清单 `auto_model_roles` 中；再次运行 `init` 时重新查询并更新这些职责。传入 `--main-model` / `--worker-model` / `--advisor-model` 会将对应职责改为手动固定；交互选择固定三种职责。旧清单没有该字段时保留原有模型，不推断当初是否由用户选择。只查询缺少显式覆盖的自动职责所需系列；已有模型、provider 和权限的合并保护仍然生效。
