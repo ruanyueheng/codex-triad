@@ -25,6 +25,14 @@ npx skills add ruanyueheng/codex-triad --agent codex
 
 ## 使用
 
+想用图形界面时，打开任务工作台：
+
+```bash
+python .agents/skills/codex-triad/scripts/triad.py gui --project .
+```
+
+选择项目，写下任务，点击“自动协作 / 快速处理 / 多人协作 / 只做审查”。工作台显示项目模型，支持任务模板、指令预览和复制到当前对话；“开始任务”会打开交互式 Codex 窗口。Windows 源码用户也可以双击 `scripts/triad_gui.pyw`。图形界面需要 Python 的 Tk 支持，开始执行会使用正常的 Codex 模型额度。
+
 在项目中打开 Codex，先配置三权：
 
 ```text
@@ -65,7 +73,7 @@ python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 
 已有配置遇到模型或推理强度问题时，加 `doctor --check-models` 对照当前客户端目录；只查询、不生成，目录不匹配显示警告。[诊断说明](docs/MODEL_ASSIGNMENT.md)
 
-提供 `models`、`init`、`doctor`、`smoke`、`uninstall`、`report` 六个命令。`models --json` 可导出模型和支持的推理强度；`init --interactive` 自选三种职责及强度。安装和卸载加 `--dry-run` 可先预览。源码安装、离线演练和更多示例见[完整指南](docs/GETTING_STARTED.md)。
+提供 `gui`、`models`、`init`、`doctor`、`smoke`、`uninstall`、`report` 七个命令。`models --json` 可导出模型和支持的推理强度；`init --interactive` 自选三种职责及强度。安装和卸载加 `--dry-run` 可先预览。源码安装、离线演练和更多示例见[完整指南](docs/GETTING_STARTED.md)。
 
 ## 测试
 

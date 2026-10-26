@@ -1,8 +1,21 @@
 # Getting started / 上手指南
 
-Choose one route: the bundled CLI configures project roles; the skill teaches Codex when and how to use them. Neither installation launches agents automatically.
+Choose one route: the graphical workbench prepares and launches tasks, the bundled CLI configures project roles, and the skill teaches Codex how to use them. Installation itself does not launch agents.
 
-选择用途：CLI 负责项目角色配置，skill 负责工作流指引。安装本身不会启动 Agent。
+选择用途：图形工作台负责选择任务和协作方式，CLI 负责项目角色配置，skill 负责工作流指引。安装本身不会启动 Agent。
+
+## Graphical task workbench
+
+在源码目录运行 `python scripts/triad.py gui --project PATH`，或在 Windows 双击 `scripts/triad_gui.pyw`。安装 wheel 后也可运行 `codex-triad-gui`。图形界面使用 Python 自带的 Tk；没有 Tk 的精简 Python 环境仍可使用原有 CLI。
+
+1. 选择项目目录。左侧读取该项目的主协调、工作者和顾问模型；未配置时沿用 Codex 当前设置，不强制先安装角色。
+2. 填写想完成的任务，或选“修复问题 / 开发功能 / 审查改动”模板。模板不会覆盖已经输入的内容。
+3. 选择自动协作、快速处理、多人协作或只做审查。“自动”由 Codex 根据任务决定分工，“快速”要求主协调直接处理，“多人”请求独立调查与审查。
+4. 点击“开始任务”打开 Codex 交互窗口；也可预览指令，或复制到已有 Codex 对话。复制内容包含选定项目路径和协作方式。点击启动才会进入实际执行并可能消耗模型额度。
+
+Windows 使用新控制台启动当前安装的 Codex；Linux 需要 `x-terminal-emulator`。没有支持的终端启动器（包括当前 macOS 路径）时，使用“复制到当前对话”。只做审查在新窗口附加 `--sandbox read-only`；复制的指令不改变已有会话的权限。其他模式沿用客户端与项目的模型、权限和信任设置，不写入全局配置。
+
+工作台是任务入口，执行与后续对话仍在 Codex 中。模式是协作偏好，实际子代理是否可用取决于客户端；没有可用角色时会要求如实说明并继续可完成的工作。
 
 ## Prerequisites
 

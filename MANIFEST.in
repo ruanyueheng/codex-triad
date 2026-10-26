@@ -53,6 +53,7 @@ include progress.md
 include pyproject.toml
 include scripts/collect_runtime.py
 include scripts/triad.py
+include scripts/triad_gui.pyw
 include src/codex_triad/__init__.py
 include src/codex_triad/__main__.py
 include src/codex_triad/appserver.py
@@ -60,10 +61,12 @@ include src/codex_triad/benchmark.py
 include src/codex_triad/checker.py
 include src/codex_triad/cli.py
 include src/codex_triad/evidence.py
+include src/codex_triad/gui.py
 include src/codex_triad/installer.py
 include src/codex_triad/models.py
 include src/codex_triad/storage.py
 include src/codex_triad/templates.py
+include src/codex_triad/workflow.py
 include task_plan.md
 include tests/test_appserver.py
 include tests/test_benchmark.py
@@ -75,5 +78,6 @@ include tests/test_installer.py
 include tests/test_models.py
 include tests/test_release.py
 include tests/test_storage.py
+include tests/test_workflow.py
 include tools/build_release.py
 include tools/check_wheel.py

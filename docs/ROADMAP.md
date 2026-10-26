@@ -4,6 +4,8 @@ Status markers: `[x]` implemented, `[ ]` proposed (not promised).
 
 ## Immediate priorities — 2026-10-26
 
+The user-facing task workbench is now implemented: project selection, task templates, four collaboration modes, prompt preview/copy and interactive Codex launch. Runtime execution remains in the native Codex client.
+
 1. [x] Diagnose installed model/effort drift with opt-in `doctor --check-models`; keep catalog matching distinct from generation access.
 2. [x] Surface transport failures promptly and close CLI launchers gracefully; cover EOF, malformed streams, inherited pipes and bounded shutdown.
 3. [ ] Expand the client compatibility fixtures to additional pinned releases and macOS, retaining actual failure records.

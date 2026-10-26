@@ -2,13 +2,15 @@
 
 ## Scope
 
-Triad 0.2.0a5 is a **generator/installer for native Codex custom agents**. It does not run the model server, intercept calls, measure actual tokens, or force event-driven delegation. Instructions in `AGENTS.md` are a *behavioral request*, not a deterministic scheduler.
+Triad is a **generator/installer for native Codex custom agents with a graphical task launcher**. The workbench prepares a task and opens the native Codex client, or copies the task into an existing chat. It does not run the model server, intercept calls, measure actual tokens, or force event-driven delegation. Instructions in `AGENTS.md` are a *behavioral request*, not a deterministic scheduler.
 
 中文入口：[安全写入 ADR](ADR-001-SAFE-INSTALL.md)、[官方配置与 P2 调查](OFFICIAL_COMPATIBILITY.md)、[运行验收](RUNTIME_VERIFICATION.md)。
 
 ## Implementation boundaries / 实现边界
 
-- `cli.py`: six stable commands (`init`, `models`, `doctor`, `smoke`, `uninstall`, `report`), exit codes and output. Explicit `--recover` performs recovery only.
+- `cli.py`: seven commands (`gui`, `init`, `models`, `doctor`, `smoke`, `uninstall`, `report`), exit codes and output. Explicit `--recover` performs recovery only.
+- `gui.py`: optional Tk task workbench with project selection, collaboration modes, prompt preview/copy and native terminal launch.
+- `workflow.py`: shared task handoff, read-only project model summary and shell-free Codex launch arguments. The native Codex client executes the task.
 
 - `templates.py`: settings, official agent fields and bounded role instructions.
 - `installer.py`: ownership, configuration merge, change planning and uninstall reports.

@@ -2,6 +2,10 @@
 
 This is an alpha preview. A passing static check, a successful model call, native role metadata and a provider-side identity proof are different kinds of evidence.
 
+## Graphical task workbench — 2026-10-26
+
+The native Tk window was opened on Windows and its layout and mode switching inspected. Focused interaction checks cover empty tasks, preservation of an existing draft, copying the selected project and mode, read-only review launch arguments, duplicate-launch prevention and restoring the start button after session exit. The installed npm Codex launcher successfully resolved through Node without a shell. All 128 unit/integration tests passed locally; wheel and standalone skill lifecycle checks passed, including the graphical entry point and bundled GUI files. No model-generation task was started by this UI check, and native Linux/macOS graphical launch was not exercised.
+
 ## Model diagnostics and transport lifecycle — 2026-10-26
 
 - Windows / Python 3.11.15 and 3.14: all 122 unit/integration tests passed on each interpreter. New coverage includes opt-in catalog checks, preserved user settings and edited role files, missing models/efforts, unavailable catalogs, no-write/default-static behavior, malformed JSON/UTF-8, pipe errors, persistent disconnects, and graceful/forced shutdown.

@@ -16,6 +16,7 @@ from .evidence import EvidenceError, verify_runtime
 from .models import ModelSelectionError, ROLE_FAMILIES, choose_settings, discover_models, latest_model
 from .installer import _previous_settings, _read_state, _validate_settings
 from .storage import assert_safe_paths
+from .workflow import WorkflowError
 
 SMOKE = {
     "workers": """Running this prompt in Codex may consume model quota. This command only prints instructions.
@@ -41,6 +42,8 @@ locally and redact secrets. Use evaluation/runtime-evidence.template.json where 
 def make_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="codex-triad", description="Configure and validate tiered Codex subagents safely")
     subs = parser.add_subparsers(dest="command", required=True)
+    gui = subs.add_parser("gui", help="Open the graphical task launcher")
+    gui.add_argument("--project", type=Path, default=Path.cwd())
     init = subs.add_parser("init", help="Install/upgrade project-scoped agents with non-destructive config merging")
     init.add_argument("--project", type=Path, default=Path.cwd())
     init.add_argument("--main-model")
@@ -86,6 +89,15 @@ def make_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = make_parser().parse_args(argv)
     try:
+        if args.command == "gui":
+            try:
+                from .gui import main as open_gui
+            except ModuleNotFoundError as exc:
+                if exc.name not in ("tkinter", "_tkinter"):
+                    raise
+                raise WorkflowError("The graphical launcher needs Python with Tk support. The CLI commands remain available.") from exc
+            open_gui(args.project)
+            return 0
         if args.command == "models":
             project = args.project.resolve()
             if not project.is_dir():
@@ -195,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             for item in uninstall(args.project, dry_run=args.dry_run):
                 print(item)
             return 0
-    except (InstallationError, BenchmarkError, EvidenceError, ModelSelectionError, OSError, UnicodeError, EOFError, KeyboardInterrupt) as exc:
+    except (InstallationError, BenchmarkError, EvidenceError, ModelSelectionError, WorkflowError, OSError, UnicodeError, EOFError, KeyboardInterrupt) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
     return 2

@@ -22,5 +22,8 @@ Changelog = "https://github.com/ruanyueheng/codex-triad/blob/main/CHANGELOG.md"
 [project.scripts]
 codex-triad = "codex_triad.cli:main"
 
+[project.gui-scripts]
+codex-triad-gui = "codex_triad.gui:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add a graphical task workbench (`gui`, `codex-triad-gui` and a Windows double-click entry point) with project/model overview, task templates, four collaboration modes, prompt preview/copy and interactive Codex launch. Preserve drafts when choosing templates, pass selected project context, and enforce a read-only sandbox for launched review tasks.
 - Add opt-in `doctor --check-models` to compare actual project model/effort settings with the client catalog, with structured warnings and isolated-home/proxy options. Default doctor stays static; catalog visibility never proves generation access.
 - Propagate malformed JSON, UTF-8 and pipe-reader failures immediately through the shared App Server client; retain terminal failures so later calls do not write to a known-disconnected server or wait for another timeout.
 - Close App Server stdin and wait for graceful exit before termination; on Windows, timed-out launchers are stopped with their child process tree. Keep shutdown idempotent and bound escalation waits.

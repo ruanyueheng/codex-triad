@@ -25,6 +25,14 @@ This uses the [skills CLI](https://github.com/vercel-labs/skills) to install int
 
 ## Usage
 
+For a graphical task launcher:
+
+```bash
+python .agents/skills/codex-triad/scripts/triad.py gui --project .
+```
+
+Choose a project, enter a task, and select Auto, Quick, Team or Review. The workbench shows project models, offers task templates and a prompt preview, and can copy the task into your current chat or open an interactive Codex window. Windows source users can double-click `scripts/triad_gui.pyw`. The GUI needs Python with Tk support; executing a task uses your normal Codex allowance. See [graphical setup](docs/GETTING_STARTED.md#graphical-task-workbench).
+
 Open Codex in your project and start with:
 
 ```text
@@ -65,7 +73,7 @@ python .agents/skills/codex-triad/scripts/triad.py doctor --project . --json
 
 For suspected model or reasoning-effort drift, add `doctor --check-models` to compare configuration with the current client catalog without generation calls. Missing entries produce warnings. See [model diagnostics](docs/MODEL_ASSIGNMENT.md).
 
-The six commands are `models`, `init`, `doctor`, `smoke`, `uninstall` and `report`. `models --json` exports visible models and reasoning options; `init --interactive` lets you assign each role and effort. Add `--dry-run` to preview installation or removal. See the [guide](docs/GETTING_STARTED.md) for source installation, offline use and examples.
+The seven commands are `gui`, `models`, `init`, `doctor`, `smoke`, `uninstall` and `report`. `models --json` exports visible models and reasoning options; `init --interactive` lets you assign each role and effort. Add `--dry-run` to preview installation or removal. See the [guide](docs/GETTING_STARTED.md) for source installation, offline use and examples.
 
 ## Tests
 
